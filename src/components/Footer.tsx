@@ -26,7 +26,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-bold mb-4">Categorías</h3>
             <ul className="space-y-2">
-              <li><Link to="#" className="text-muted-foreground hover:text-primary transition-colors">Desarrollo Web</Link></li>
+              <li><Link to="#" className="text-muted-foreground hover:text-primary transition-colors">Enfermería</Link></li>
               <li><Link to="#" className="text-muted-foreground hover:text-primary transition-colors">Diseño Gráfico</Link></li>
               <li><Link to="#" className="text-muted-foreground hover:text-primary transition-colors">Marketing Digital</Link></li>
               <li><Link to="#" className="text-muted-foreground hover:text-primary transition-colors">Idiomas</Link></li>
