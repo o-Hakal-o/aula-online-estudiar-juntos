@@ -1,8 +1,25 @@
 
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { 
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { Hospital } from "lucide-react";
 
 const HeroSection = () => {
+  const nursingImages = [
+    "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?q=80&w=1200",
+    "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?q=80&w=1200",
+    "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?q=80&w=1200",
+    "https://images.unsplash.com/photo-1516549655169-df83a0774514?q=80&w=1200",
+    "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1200"
+  ];
+
   return (
     <section className="bg-gradient-to-b from-background to-muted py-16 md:py-24">
       <div className="container mx-auto px-4">
@@ -26,25 +43,33 @@ const HeroSection = () => {
           </div>
           
           <div className="hidden md:block relative">
-            <div className="relative bg-gradient-to-br from-primary/20 to-secondary/20 rounded-2xl p-6 shadow-xl animate-float">
-              <div className="bg-white rounded-lg shadow-lg p-5">
-                <div className="w-full h-40 bg-muted rounded-md mb-4"></div>
-                <div className="h-6 bg-muted rounded-md w-2/3 mb-3"></div>
-                <div className="h-4 bg-muted rounded-md w-full mb-3"></div>
-                <div className="h-4 bg-muted rounded-md w-5/6"></div>
-                <div className="flex justify-between items-center mt-4">
-                  <div className="h-8 bg-primary rounded-md w-1/3"></div>
-                  <div className="h-8 bg-accent rounded-md w-1/4"></div>
+            <Carousel className="w-full max-w-md mx-auto">
+              <CarouselContent>
+                {nursingImages.map((image, index) => (
+                  <CarouselItem key={index}>
+                    <div className="p-1">
+                      <div className="overflow-hidden rounded-xl border border-muted shadow-md">
+                        <AspectRatio ratio={16/9}>
+                          <img 
+                            src={image} 
+                            alt={`Imagen de enfermería ${index + 1}`} 
+                            className="object-cover w-full h-full transition-transform duration-500 hover:scale-105"
+                          />
+                        </AspectRatio>
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <div className="flex items-center justify-center gap-2 mt-4">
+                <CarouselPrevious className="relative inline-flex -left-0 h-9 w-9" />
+                <div className="flex items-center gap-1">
+                  <Hospital className="h-5 w-5 text-primary" />
+                  <span className="text-sm font-medium">Galería de Enfermería</span>
                 </div>
+                <CarouselNext className="relative inline-flex -right-0 h-9 w-9" />
               </div>
-              <div className="absolute -bottom-6 -right-6 bg-white rounded-lg shadow-lg p-5 w-2/3">
-                <div className="h-4 bg-muted rounded-md w-full mb-3"></div>
-                <div className="h-4 bg-muted rounded-md w-4/5"></div>
-                <div className="flex justify-end mt-3">
-                  <div className="h-6 bg-secondary rounded-md w-1/4"></div>
-                </div>
-              </div>
-            </div>
+            </Carousel>
           </div>
         </div>
       </div>
