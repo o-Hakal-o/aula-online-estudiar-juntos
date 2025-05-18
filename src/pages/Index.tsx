@@ -7,6 +7,14 @@ import LoginForm from "@/components/LoginForm";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from "@/components/ui/carousel";
+import { GraduationCap } from "lucide-react";
 
 const Index = () => {
   // Mock course data
@@ -105,13 +113,27 @@ const Index = () => {
             </TabsList>
           </Tabs>
 
-          <div className="course-grid">
-            {filteredCourses.map(course => (
-              <CourseCard key={course.id} {...course} />
-            ))}
-          </div>
+          <Carousel className="w-full max-w-5xl mx-auto mb-12">
+            <CarouselContent>
+              {filteredCourses.map((course) => (
+                <CarouselItem key={course.id} className="md:basis-1/2 lg:basis-1/3">
+                  <div className="p-2">
+                    <CourseCard {...course} />
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex items-center justify-center gap-2 mt-6">
+              <CarouselPrevious className="relative inline-flex -left-0 h-9 w-9" />
+              <div className="flex items-center gap-1">
+                <GraduationCap className="h-5 w-5 text-primary" />
+                <span className="text-sm font-medium">Cursos Disponibles</span>
+              </div>
+              <CarouselNext className="relative inline-flex -right-0 h-9 w-9" />
+            </div>
+          </Carousel>
 
-          <div className="text-center mt-12">
+          <div className="text-center mt-6">
             <Button size="lg" variant="outline">Ver Todos los Cursos</Button>
           </div>
         </section>
