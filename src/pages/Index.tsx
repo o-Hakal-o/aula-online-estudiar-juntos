@@ -15,6 +15,9 @@ import {
   CarouselNext,
 } from "@/components/ui/carousel";
 import { GraduationCap } from "lucide-react";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
+import { useCallback } from "react";
 
 const Index = () => {
   // Mock course data
@@ -75,6 +78,33 @@ const Index = () => {
   const categories = ["Todos", "Fundamentos", "Farmacología", "Especialización", "Habilidades Blandas"];
   const [selectedCategory, setSelectedCategory] = useState("Todos");
   const [filteredCourses, setFilteredCourses] = useState(mockCourses);
+  const [api, setApi] = useState<any>(null);
+  const [current, setCurrent] = useState(0);
+
+  const autoplayOptions = {
+    delay: 4000,
+    rootNode: (emblaRoot: HTMLElement) => emblaRoot,
+    stopOnInteraction: false,
+    stopOnMouseEnter: true,
+  };
+
+  const onSelect = useCallback(() => {
+    if (!api) return;
+    setCurrent(api.selectedScrollSnap());
+  }, [api]);
+
+  useEffect(() => {
+    if (!api) return;
+    
+    onSelect();
+    api.on('select', onSelect);
+    api.on('reInit', onSelect);
+    
+    return () => {
+      api.off('select', onSelect);
+      api.off('reInit', onSelect);
+    };
+  }, [api, onSelect]);
 
   useEffect(() => {
     if (selectedCategory === "Todos") {
@@ -113,21 +143,29 @@ const Index = () => {
             </TabsList>
           </Tabs>
 
-          <Carousel className="w-full max-w-5xl mx-auto mb-12">
+          <Carousel 
+            className="w-full max-w-3xl mx-auto mb-12"
+            setApi={setApi}
+            plugins={[
+              Autoplay(autoplayOptions)
+            ]}
+          >
             <CarouselContent>
               {filteredCourses.map((course) => (
-                <CarouselItem key={course.id} className="md:basis-1/2 lg:basis-1/3">
+                <CarouselItem key={course.id} className="basis-full">
                   <div className="p-2">
                     <CourseCard {...course} />
                   </div>
                 </CarouselItem>
               ))}
             </CarouselContent>
-            <div className="flex items-center justify-center gap-2 mt-6">
+            <div className="flex items-center justify-center gap-4 mt-6">
               <CarouselPrevious className="relative inline-flex -left-0 h-9 w-9" />
               <div className="flex items-center gap-1">
                 <GraduationCap className="h-5 w-5 text-primary" />
-                <span className="text-sm font-medium">Cursos Disponibles</span>
+                <span className="text-sm font-medium">
+                  {current + 1} de {filteredCourses.length} cursos
+                </span>
               </div>
               <CarouselNext className="relative inline-flex -right-0 h-9 w-9" />
             </div>
