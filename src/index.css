@@ -64,17 +64,17 @@
 /* Estilos para el carrusel de cursos */
 .course-carousel .embla__slide {
   height: 100%;
-  padding-bottom: 0.5rem;
+  padding-bottom: 0.3rem;
 }
 
 /* Animación para el carrusel automático */
 @keyframes fadeIn {
-  from { opacity: 0.4; }
+  from { opacity: 0.2; }
   to { opacity: 1; }
 }
 
 .embla__slide {
-  animation: fadeIn 0.5s ease-in-out;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
 .embla__slide__current {
