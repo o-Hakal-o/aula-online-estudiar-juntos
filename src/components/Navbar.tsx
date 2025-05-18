@@ -11,9 +11,9 @@ const Navbar = () => {
 
   const navLinks = [
     { name: "Home", href: "/" },
-    { name: "Courses", href: "#courses" },
-    { name: "About", href: "#about" },
-    { name: "Contact", href: "#contact" },
+    { name: "Cursos", href: "#courses" },
+    { name: "Nosotros", href: "#about" },
+    { name: "Contacto", href: "#contact" },
   ];
 
   const NavLinks = () => (
@@ -34,7 +34,7 @@ const Navbar = () => {
     <nav className="border-b bg-background/95 backdrop-blur-sm sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
-          <span className="text-2xl font-bold text-primary">AulaOnline</span>
+          <span className="text-2xl font-bold text-primary">EnfermeríaOnline</span>
         </Link>
 
         {isMobile ? (

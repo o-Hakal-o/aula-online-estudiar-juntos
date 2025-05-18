@@ -9,11 +9,11 @@ const HeroSection = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
           <div className="text-center md:text-left">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
-              <span className="text-primary">Estudia</span> cuando y donde 
-              <span className="text-accent"> quieras</span>
+              <span className="text-primary">Formación</span> en enfermería 
+              <span className="text-accent"> de calidad</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Únete a miles de estudiantes y accede a cursos de alta calidad. Aprende a tu propio ritmo y mejora tus habilidades.
+              Únete a miles de profesionales de enfermería y accede a cursos especializados. Aprende a tu propio ritmo y mejora tus competencias clínicas.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <Button size="lg" asChild>
