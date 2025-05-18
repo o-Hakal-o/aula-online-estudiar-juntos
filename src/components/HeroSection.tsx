@@ -10,6 +10,8 @@ import {
 } from "@/components/ui/carousel";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Hospital } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import Autoplay from "embla-carousel-autoplay";
 
 const HeroSection = () => {
   const nursingImages = [
@@ -19,6 +21,34 @@ const HeroSection = () => {
     "https://images.unsplash.com/photo-1516549655169-df83a0774514?q=80&w=1200",
     "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1200"
   ];
+
+  const [api, setApi] = useState<any>(null);
+  const [current, setCurrent] = useState(0);
+
+  const autoplayOptions = {
+    delay: 3500,
+    rootNode: (emblaRoot: HTMLElement) => emblaRoot,
+    stopOnInteraction: false,
+    stopOnMouseEnter: true,
+  };
+
+  const onSelect = useCallback(() => {
+    if (!api) return;
+    setCurrent(api.selectedScrollSnap());
+  }, [api]);
+
+  useEffect(() => {
+    if (!api) return;
+    
+    onSelect();
+    api.on('select', onSelect);
+    api.on('reInit', onSelect);
+    
+    return () => {
+      api.off('select', onSelect);
+      api.off('reInit', onSelect);
+    };
+  }, [api, onSelect]);
 
   return (
     <section className="bg-gradient-to-b from-background to-muted py-16 md:py-24">
@@ -43,13 +73,19 @@ const HeroSection = () => {
           </div>
           
           <div className="hidden md:block relative">
-            <Carousel className="w-full max-w-md mx-auto">
+            <Carousel 
+              className="w-full max-w-lg mx-auto"
+              setApi={setApi}
+              plugins={[
+                Autoplay(autoplayOptions)
+              ]}
+            >
               <CarouselContent>
                 {nursingImages.map((image, index) => (
                   <CarouselItem key={index}>
                     <div className="p-1">
                       <div className="overflow-hidden rounded-xl border border-muted shadow-md">
-                        <AspectRatio ratio={16/9}>
+                        <AspectRatio ratio={4/3}>
                           <img 
                             src={image} 
                             alt={`Imagen de enfermería ${index + 1}`} 
@@ -61,11 +97,13 @@ const HeroSection = () => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <div className="flex items-center justify-center gap-2 mt-4">
+              <div className="flex items-center justify-center gap-4 mt-4">
                 <CarouselPrevious className="relative inline-flex -left-0 h-9 w-9" />
                 <div className="flex items-center gap-1">
                   <Hospital className="h-5 w-5 text-primary" />
-                  <span className="text-sm font-medium">Galería de Enfermería</span>
+                  <span className="text-sm font-medium">
+                    {current + 1} de {nursingImages.length}
+                  </span>
                 </div>
                 <CarouselNext className="relative inline-flex -right-0 h-9 w-9" />
               </div>
