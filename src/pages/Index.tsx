@@ -61,16 +61,7 @@ const Index = () => {
       image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085",
       category: "Habilidades Blandas"
     },
-    {
-      id: 6,
-      title: "Primeros Auxilios Básicos",
-      description: "Aprende técnicas esenciales de primeros auxilios que todo profesional de enfermería debe dominar en situaciones de emergencia.",
-      instructor: "Dr. Roberto Méndez",
-      level: "Principiante",
-      price: 0,
-      image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1",
-      category: "Fundamentos"
-    },
+    
   ];
 
   const categories = ["Todos", "Fundamentos", "Farmacología", "Especialización", "Habilidades Blandas"];
