@@ -232,16 +232,7 @@ const Index = () => {
         </section>
 
         {/* Call to Action */}
-        <section id="login" className="py-16 container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">¡Comienza tu Carrera en Enfermería Hoy!</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Crea una cuenta o inicia sesión para acceder a todos los cursos de enfermería
-            </p>
-          </div>
-
-          <LoginForm />
-        </section>
+       
       </main>
       <Footer />
     </div>
