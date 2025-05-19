@@ -62,7 +62,7 @@ const Navbar = () => {
               <div className="flex flex-col space-y-4 mt-8">
                 <NavLinks />
                 <Button asChild className="w-full">
-                  <Link to="#login">Iniciar Sesión</Link>
+                  <Link to="/login">Iniciar Sesión</Link>
                 </Button>
               </div>
             </SheetContent>
@@ -73,7 +73,7 @@ const Navbar = () => {
               <NavLinks />
             </div>
             <Button asChild>
-              <Link to="#login">Iniciar Sesión</Link>
+              <Link to="/login">Iniciar Sesión</Link>
             </Button>
           </div>
         )}
