@@ -31,6 +31,21 @@ const CourseCard = ({
     Avanzado: "bg-purple-100 text-purple-800",
   };
 
+  // Determinar la ruta basada en el título del curso
+  const getCourseRoute = () => {
+    if (title === "Cuidados Intensivos") {
+      return "/curso/cuidados-intensivos";
+    }
+    return "#login"; // Para otros cursos, mantener el comportamiento original
+  };
+
+  const getButtonText = () => {
+    if (title === "Cuidados Intensivos") {
+      return "Ver Curso";
+    }
+    return "Inscribirse";
+  };
+
   return (
     <Card className="overflow-hidden transition-all hover:shadow-lg h-full flex flex-col">
       <div className="aspect-video w-full overflow-hidden">
@@ -68,7 +83,7 @@ const CourseCard = ({
           {price === 0 ? "Gratis" : `$${price.toFixed(2)}`}
         </div>
         <Button asChild>
-          <Link to="#login">Inscribirse</Link>
+          <Link to={getCourseRoute()}>{getButtonText()}</Link>
         </Button>
       </CardFooter>
     </Card>
