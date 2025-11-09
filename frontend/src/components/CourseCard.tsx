@@ -1,6 +1,12 @@
-
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Link } from "react-router-dom";
 
@@ -41,7 +47,7 @@ const CourseCard = ({
 
   const getButtonText = () => {
     if (title === "Cuidados Intensivos") {
-      return "Ver Curso";
+      return "Inscribirse";
     }
     return "Inscribirse";
   };
@@ -61,10 +67,7 @@ const CourseCard = ({
           <Badge variant="outline" className="mb-2">
             {category}
           </Badge>
-          <Badge 
-            variant="secondary" 
-            className={levelColorMap[level]}
-          >
+          <Badge variant="secondary" className={levelColorMap[level]}>
             {level}
           </Badge>
         </div>
@@ -82,9 +85,19 @@ const CourseCard = ({
         <div className="text-lg font-bold">
           {price === 0 ? "Gratis" : `$${price.toFixed(2)}`}
         </div>
-        <Button asChild>
-          <Link to={getCourseRoute()}>{getButtonText()}</Link>
-        </Button>
+        {title === "Cuidados Intensivos" ? (
+          // Mostrar solo el botón de inscripción sin navegar a una página de detalles
+          <Button
+            onClick={() => {
+              /* Acción de inscripción futura */
+            }}>
+            {getButtonText()}
+          </Button>
+        ) : (
+          <Button asChild>
+            <Link to={getCourseRoute()}>{getButtonText()}</Link>
+          </Button>
+        )}
       </CardFooter>
     </Card>
   );
