@@ -6,7 +6,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 
 class CustomUser(AbstractUser):
-    # ⭐️ FIX: Explicitly define the email field as unique
+    #FIX: Explicitly define the email field as unique
     email = models.EmailField(unique=True, blank=False)
     # Define choices for the user's role
     ROLE_CHOICES = (
@@ -20,13 +20,13 @@ class CustomUser(AbstractUser):
         choices=ROLE_CHOICES, 
         default='STUDENT'
     )
-    # ⭐️ CRITICAL: Set email as the main field for authentication (login)
+    # CRITICAL: Set email as the main field for authentication (login)
     USERNAME_FIELD = 'email'
     
-    # ⭐️ Define required fields (excluding email/password) for createsuperuser
+    #Define required fields (excluding email/password) for createsuperuser
     REQUIRED_FIELDS = ['role', 'username']
     
-    # You generally don't need to redefine name/email/password fields, 
+    # You  generally don't need to redefine name/email/password fields, 
     # as AbstractUser already provides first_name, last_name, email, and password.
     
     class Meta:
