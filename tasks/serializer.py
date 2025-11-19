@@ -43,3 +43,5 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     # which is used by AbstractBaseUser for authentication.
     # We override this to tell the base class to use 'email' instead.
    username_field = 'email'
+   
+   
