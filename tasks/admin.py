@@ -5,7 +5,7 @@ from django.contrib import admin
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin # <--- CORRECT LOCATION
-from .models import CustomUser
+from .models import CustomUser, ProfessorFile
 
 # Define the custom admin class
 class CustomUserAdmin(UserAdmin):
@@ -19,3 +19,7 @@ class CustomUserAdmin(UserAdmin):
 # Usa la clase de administración personalizada si la definiste
 admin.site.register(CustomUser, CustomUserAdmin)
 
+@admin.register(ProfessorFile)
+class ProfessorFileAdmin(admin.ModelAdmin):
+    list_display = ('file', 'uploaded_by', 'uploaded_at')
+    list_filter = ('uploaded_by__role',) # Filter files by role

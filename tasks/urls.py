@@ -8,6 +8,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from .views import LoginView, FileManagementView
 #from .views import RegisterView
 
 router = routers.DefaultRouter()
@@ -22,5 +23,6 @@ urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='token_obtain_pair'),
     # 3. Token Refresh - Get a new access token using a valid refresh token
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('upload', views.uploadFile.as_view() , name = 'upload'),
+    # 4. Redirect t the place where the teachers uppload archives 
+    path('api/files/', FileManagementView.as_view(), name='files_manager'),
 ]

@@ -12,7 +12,7 @@
 #       return CustomUser# yourappname/serializer.py (Adjusted)
 
 from rest_framework import serializers
-from .models import CustomUser
+from .models import CustomUser,ProfessorFile
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -43,5 +43,11 @@ class EmailTokenObtainPairSerializer(TokenObtainPairSerializer):
     # which is used by AbstractBaseUser for authentication.
     # We override this to tell the base class to use 'email' instead.
    username_field = 'email'
+   
+class ProfessorFileSerializer(serializers.ModelSerializer):
+     class Meta:
+         model = ProfessorFile
+         fields = ['id', 'file', 'title', 'uploaded_at', 'uploaded_by']
+         read_only_fields = ['uploaded_by', 'uploaded_at']
    
    
