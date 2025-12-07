@@ -1,88 +1,66 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-// Tabs removed — solo se muestra el formulario de login
 import {
   Card,
   CardContent,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { useToast } from "@/components/ui/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { useAuth } from "@/contexts/AuthContext";
+
+// Esquema de validación con Zod
+const loginSchema = z.object({
+  email: z
+    .string()
+    .min(1, "El email es requerido")
+    .email("Debe ser un email válido"),
+  password: z
+    .string()
+    .min(1, "La contraseña es requerida")
+    .min(6, "La contraseña debe tener al menos 6 caracteres"),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
 
 const LoginForm = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
-  const [isLoading, setIsLoading] = useState(false);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const { login, isLoading } = useAuth();
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
 
+  const onSubmit = async (values: LoginFormValues) => {
     try {
-      const response = await fetch("http://127.0.0.1:8000/tasks/auth/login/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
+      await login({
+        email: values.email,
+        password: values.password,
       });
-
-      if (!response.ok) {
-        // try to get a useful error message from the response
-        let errMsg = "Error en la solicitud";
-        try {
-          const errData = await response.json();
-          if (errData?.detail) errMsg = errData.detail;
-          else if (errData?.message) errMsg = errData.message;
-        } catch (e) {
-          /* ignore json parse error */
-        }
-        throw new Error(errMsg);
-      }
-
-      const data = await response.json();
-      // Si el backend devuelve un token (o access/refresh), guárdalo
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-      } else if (data.access) {
-        // JWT style (access/refresh)
-        localStorage.setItem("accessToken", data.access);
-        if (data.refresh) localStorage.setItem("refreshToken", data.refresh);
-      }
-      if (data.user) {
-        try {
-          localStorage.setItem("user", JSON.stringify(data.user));
-        } catch (e) {
-          // ignore storage errors
-        }
-      }
-
-      toast({
-        title: "Inicio de sesión exitoso",
-        description: `Bienvenido${
-          data.user?.first_name ? ", " + data.user.first_name : ""
-        }`,
-      });
-
-      // Redirigir al inicio u otra ruta proteGida
+      // La navegación se maneja en el contexto después del login exitoso
       navigate("/");
     } catch (error) {
-      const msg =
-        error instanceof Error
-          ? error.message
-          : "Verifica tus credenciales e intenta nuevamente.";
-      toast({
-        title: "Error en el inicio de sesión",
-        description: msg,
-      });
-    } finally {
-      setIsLoading(false);
+      // El error ya se maneja en el contexto de autenticación
+      // Solo necesitamos asegurarnos de que el formulario no se resetee en caso de error
+      console.error("Error en login:", error);
     }
   };
 
@@ -91,41 +69,64 @@ const LoginForm = () => {
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl text-center">
-            Acceso Estudiantes
+            Iniciar Sesión
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleLogin} className="space-y-4 pt-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="tu@email.com"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 pt-4">
+              <FormField
+                control={form.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="tu@email.com"
+                        disabled={isLoading}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Contraseña</Label>
-                <a href="#" className="text-sm text-primary hover:underline">
-                  ¿Olvidaste tu contraseña?
-                </a>
-              </div>
-              <Input
-                id="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <div className="flex items-center justify-between">
+                      <FormLabel>Contraseña</FormLabel>
+                      <Link
+                        to="/recuperar-contraseña"
+                        className="text-sm text-primary hover:underline"
+                      >
+                        ¿Olvidaste tu contraseña?
+                      </Link>
+                    </div>
+                    <FormControl>
+                      <Input
+                        type="password"
+                        disabled={isLoading}
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
-              {isLoading ? "Iniciando..." : "Iniciar Sesión"}
-            </Button>
-          </form>
+              <Button 
+                type="submit" 
+                className="w-full" 
+                disabled={isLoading}
+              >
+                {isLoading ? "Iniciando..." : "Iniciar Sesión"}
+              </Button>
+            </form>
+          </Form>
         </CardContent>
       </Card>
     </div>

@@ -1,7 +1,7 @@
 import os
 from django.shortcuts import render, HttpResponse
 from django.http import JsonResponse
-
+from .permissions import IsStudentOrProfessor
 # --- REST FRAMEWORK IMPORTS ---
 from rest_framework import status, permissions
 from rest_framework.views import APIView
@@ -14,6 +14,8 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 # Make sure these match your actual file names (e.g. 'models.py', 'serializer.py')
 from .models import CustomUser, ProfessorFile 
 from .serializer import EmailTokenObtainPairSerializer, ProfessorFileSerializer
+from django.http import FileResponse, Http404
+from .permissions import IsStudent
 
 # ==========================================
 # 1. AUTH VIEWS
@@ -24,7 +26,7 @@ class LoginView(TokenObtainPairView):
     Endpoint de Login que acepta 'email' y 'password' y devuelve tokens JWT.
     """
     serializer_class = EmailTokenObtainPairSerializer
-
+    
 def index(request):
     return HttpResponse("hi")
 
@@ -107,4 +109,49 @@ class FileManagementView(APIView):
             return Response(
                 {"error": "El archivo no existe o no tienes permiso."}, 
                 status=status.HTTP_404_NOT_FOUND
+            )
+            
+            
+class FileDownloadView(APIView):
+    # Permite solo a usuarios autenticados que sean estudiantes
+    permission_classes = [IsStudentOrProfessor]
+    
+
+    def get(self, request, file_id, format=None):
+        try:
+            # 1. Obtener el objeto del archivo
+            file_instance = ProfessorFile.objects.get(pk=file_id)
+            
+            # 2. Verificar que el archivo exista en el sistema de archivos
+            file_path = file_instance.file.path
+            
+            # 3. Usar FileResponse para servir el archivo
+            response = FileResponse(open(file_path, 'rb'))
+            
+            # 4. Establecer el encabezado Content-Disposition para forzar la descarga
+            # Esto usa el nombre original del archivo (o el título si lo prefieres)
+            response['Content-Disposition'] = f'attachment; filename="{file_instance.file.name.split("/")[-1]}"'
+            
+            # 5. Establecer el tipo de contenido
+            # (Django a menudo lo infiere, pero es buena práctica)
+            response['Content-Type'] = 'application/octet-stream' 
+            
+            return response
+        
+        except ProfessorFile.DoesNotExist:
+            return Response(
+                {"detail": "El archivo solicitado no existe."}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
+        except FileNotFoundError:
+             # Ocurrirá si la entrada existe en la BD pero el archivo físico fue borrado
+            return Response(
+                {"detail": "El archivo físico no se encuentra en el servidor."}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+        except Exception as e:
+            # Manejar otros errores
+            return Response(
+                {"detail": f"Error al procesar la descarga: {str(e)}"}, 
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
             )

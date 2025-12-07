@@ -37,67 +37,47 @@ const CourseCard = ({
     Avanzado: "bg-purple-100 text-purple-800",
   };
 
-  // Determinar la ruta basada en el título del curso
-  const getCourseRoute = () => {
-    if (title === "Cuidados Intensivos") {
-      return "/curso/cuidados-intensivos";
-    }
-    return "#login"; // Para otros cursos, mantener el comportamiento original
-  };
-
-  const getButtonText = () => {
-    if (title === "Cuidados Intensivos") {
-      return "Inscribirse";
-    }
-    return "Inscribirse";
-  };
+  // Ruta al detalle del curso usando el ID
+  const courseRoute = `/curso/${id}`;
 
   return (
-    <Card className="overflow-hidden transition-all hover:shadow-lg h-full flex flex-col">
-      <div className="aspect-video w-full overflow-hidden">
-        <img
-          src={`${image}?q=80&w=600`}
-          alt={title}
-          className="h-full w-full object-cover transition-transform hover:scale-105"
-          loading="lazy"
-        />
-      </div>
-      <CardHeader className="p-4">
-        <div className="flex justify-between items-start">
-          <Badge variant="outline" className="mb-2">
-            {category}
-          </Badge>
-          <Badge variant="secondary" className={levelColorMap[level]}>
-            {level}
-          </Badge>
+    <Card className="overflow-hidden transition-all hover:shadow-lg h-full flex flex-col cursor-pointer group">
+      <Link to={courseRoute} className="block">
+        <div className="aspect-video w-full overflow-hidden">
+          <img
+            src={`${image}?q=80&w=600`}
+            alt={title}
+            className="h-full w-full object-cover transition-transform group-hover:scale-105"
+            loading="lazy"
+          />
         </div>
-        <CardTitle className="line-clamp-2 text-xl">{title}</CardTitle>
-        <CardDescription className="text-sm text-muted-foreground">
-          Instructor: {instructor}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-4 pt-0 flex-1">
-        <p className="line-clamp-3 text-sm text-muted-foreground">
-          {description}
-        </p>
-      </CardContent>
+        <CardHeader className="p-4">
+          <div className="flex justify-between items-start">
+            <Badge variant="outline" className="mb-2">
+              {category}
+            </Badge>
+            <Badge variant="secondary" className={levelColorMap[level]}>
+              {level}
+            </Badge>
+          </div>
+          <CardTitle className="line-clamp-2 text-xl">{title}</CardTitle>
+          <CardDescription className="text-sm text-muted-foreground">
+            Instructor: {instructor}
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-4 pt-0 flex-1">
+          <p className="line-clamp-3 text-sm text-muted-foreground">
+            {description}
+          </p>
+        </CardContent>
+      </Link>
       <CardFooter className="p-4 pt-0 flex justify-between items-center mt-auto">
         <div className="text-lg font-bold">
           {price === 0 ? "Gratis" : `$${price.toFixed(2)}`}
         </div>
-        {title === "Cuidados Intensivos" ? (
-          // Mostrar solo el botón de inscripción sin navegar a una página de detalles
-          <Button
-            onClick={() => {
-              /* Acción de inscripción futura */
-            }}>
-            {getButtonText()}
-          </Button>
-        ) : (
-          <Button asChild>
-            <Link to={getCourseRoute()}>{getButtonText()}</Link>
-          </Button>
-        )}
+        <Button asChild>
+          <Link to={courseRoute}>Ver Detalles</Link>
+        </Button>
       </CardFooter>
     </Card>
   );
