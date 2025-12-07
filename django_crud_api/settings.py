@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-
+from datetime import timedelta
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'coreapi',
     'django_extensions',
     'tasks',
+    'rest_framework_simplejwt',
      
     
 ]
@@ -140,4 +141,20 @@ REST_FRAMEWORK = {
     
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',),
+}
+
+
+
+SIMPLE_JWT = {
+    # Access tokens are short-lived for security (e.g., 5 minutes)
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    
+    # Refresh tokens are long-lived, which you use at /refresh/ (e.g., 7 days)
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    
+    # This setting is usually True by default but good to verify
+    "ROTATE_REFRESH_TOKENS": False,
+    
+    # The key used in the header when authenticating
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }

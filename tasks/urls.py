@@ -2,12 +2,13 @@ from django.urls import path , include
 from rest_framework import routers
 from . import views
 from rest_framework.documentation import include_docs_urls
-from .views import LoginView
+from .views import LoginView, FileManagementView, FileDownloadView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from .views import LoginView, FileManagementView
 #from .views import RegisterView
 
 router = routers.DefaultRouter()
@@ -22,5 +23,7 @@ urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='token_obtain_pair'),
     # 3. Token Refresh - Get a new access token using a valid refresh token
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('upload', views.uploadFile.as_view() , name = 'upload'),
+    # 4. Redirect t the place where the teachers uppload archives 
+    path('api/files/', FileManagementView.as_view(), name='files_manager'),
+    path('api/files/download/<int:file_id>/', FileDownloadView.as_view(), name='file_download'),
 ]

@@ -1,0 +1,55 @@
+
+# yourappname/views.py
+
+from rest_framework import serializers, generics, permissions , status
+from rest_framework.response import Response
+#from .serializer import RegisterSerializer
+from .models import CustomUser
+from rest_framework_simplejwt.views import TokenObtainPairView
+from .serializer import EmailTokenObtainPairSerializer
+from django.shortcuts import render , HttpResponse
+from django.http import JsonResponse
+from rest_framework.views import APIView
+# class RegisterView(generics.CreateAPIView):
+#     """
+#     Handles new user registration (Sign Up).
+#     """
+#     queryset = CustomUser.objects.all()
+#     permission_classes = [permissions.AllowAny] # Allow anyone to register
+#     serializer_class = RegisterSerializer
+
+#     def post(self, request, *args, **kwargs):
+#         # Optional: You can customize the response after successful creation
+#         return super().post(request, *args, **kwargs)
+    
+
+class LoginView(TokenObtainPairView):
+    """
+    Login endpoint that accepts 'email' and 'password' and returns JWT tokens.
+    """
+    serializer_class = EmailTokenObtainPairSerializer
+    
+
+def index(request):
+    return HttpResponse("hi")
+
+class uploadFile(APIView):
+    def get(self, request):
+        return Response(
+            {"message": "Please use a POST request to upload a photo file."}, 
+            status=status.HTTP_200_OK # A 200 OK or 405 Method Not Allowed is appropriate here.
+        )
+    def post(self,request):
+        
+        file = request.FILES['file']
+        file_name = file.name
+        destination = 'media/'
+        print(file_name)
+        output = f'{destination}{file_name}'
+        fn = open(output , 'wb+')
+        for cjunk in file.chunks():
+            fn.write(chunk)
+        fn.close()
+        return HttpResponse('% is upload succesfuly ' % file_name)
+        
+        

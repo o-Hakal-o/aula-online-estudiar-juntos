@@ -12,6 +12,7 @@ import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Hospital } from "lucide-react";
 import { useState, useEffect, useCallback } from "react";
 import Autoplay from "embla-carousel-autoplay";
+import type { CarouselApi } from "@/types/carousel.types";
 
 const HeroSection = () => {
   const nursingImages = [
@@ -22,7 +23,7 @@ const HeroSection = () => {
     "https://images.unsplash.com/photo-1576091160550-2173dba999ef?q=80&w=1200"
   ];
 
-  const [api, setApi] = useState<any>(null);
+  const [api, setApi] = useState<CarouselApi>(null);
   const [current, setCurrent] = useState(0);
 
   const autoplayOptions = {
@@ -57,10 +58,10 @@ const HeroSection = () => {
           <div className="text-center md:text-left">
             <h1 className="text-4xl md:text-6xl font-bold tracking-tight mb-6">
               <span className="text-primary">Formación</span> en enfermería 
-              <span className="text-accent"> de calidad</span>
+              <span className="text-accent"> de excelencia</span>
             </h1>
             <p className="text-xl text-muted-foreground mb-8">
-              Únete a miles de profesionales de enfermería y accede a cursos especializados. Aprende a tu propio ritmo y mejora tus competencias clínicas.
+              Únete a miles de profesionales de enfermería y accede a cursos especializados diseñados por expertos. Aprende a tu propio ritmo y desarrolla las competencias clínicas que necesitas para destacar en tu carrera.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
               <Button size="lg" asChild>

@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from "react";
 import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import CourseCard, { CourseProps } from "@/components/CourseCard";
-import LoginForm from "@/components/LoginForm";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,11 +11,12 @@ import {
   CarouselPrevious,
   CarouselNext,
 } from "@/components/ui/carousel";
-import { GraduationCap, Heart, Users, Award, Clock } from "lucide-react";
-import { UseEmblaCarouselType } from "embla-carousel-react";
+import { GraduationCap } from "lucide-react";
 import Autoplay from "embla-carousel-autoplay";
+import type { CarouselApi } from "@/types/carousel.types";
 
 // Mock course data (moved outside component to avoid hook dependency warnings)
+// TODO: Reemplazar con llamada al backend cuando esté disponible
 const mockCourses: CourseProps[] = [
   {
     id: 1,
@@ -79,9 +79,7 @@ const mockCourses: CourseProps[] = [
 
 const Index = () => {
   const [filteredCourses, setFilteredCourses] = useState(mockCourses);
-  // allow any here because the embla type from the carousel wrapper can vary
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [api, setApi] = useState<any | null>(null);
+  const [api, setApi] = useState<CarouselApi>(null);
   const [current, setCurrent] = useState(0);
 
   const autoplayOptions = {
@@ -127,8 +125,8 @@ const Index = () => {
               Nuestros Cursos de Enfermería
             </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Explora nuestra selección de cursos especializados para
-              profesionales y estudiantes de enfermería
+              Explora nuestra selección de cursos especializados diseñados para
+              profesionales y estudiantes de enfermería que buscan mejorar sus competencias
             </p>
           </div>
 
@@ -173,11 +171,11 @@ const Index = () => {
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">
-                ¿Por qué estudiar enfermería con nosotros?
+                ¿Por qué elegir EnfermeríaOnline?
               </h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 Forma parte de la próxima generación de profesionales de la
-                salud con nuestra metodología única
+                salud con nuestra metodología innovadora y contenido de alta calidad
               </p>
             </div>
 

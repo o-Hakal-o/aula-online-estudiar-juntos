@@ -12,7 +12,7 @@ const Login = () => {
       <main className="flex-1 container mx-auto px-4 py-12">
         <div className="max-w-md mx-auto">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold mb-2">Acceso a Estudiantes</h1>
+            <h1 className="text-3xl font-bold mb-2">Iniciar Sesión</h1>
             <p className="text-muted-foreground">
               Ingresa con tu cuenta para acceder a los cursos y recursos de EnfermeríaOnline
             </p>
