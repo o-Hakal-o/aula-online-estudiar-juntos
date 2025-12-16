@@ -26,3 +26,5 @@ dist-ssr
 # Ignore Python cache files and directories
 *.pyc
 __pycache__/
+venv
+db.sqlite3
