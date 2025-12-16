@@ -170,6 +170,11 @@ class SuperuserInitView(APIView):
         try:
             # 1. LEER EL CUERPO RAW Y DECODIFICARLO
             body_unicode = request.body.decode('utf-8')
+            if not body_unicode:
+                 return Response(
+                     {"error": "Error fatal: El cuerpo de la solicitud (JSON) está vacío."}, 
+                     status=status.HTTP_400_BAD_REQUEST
+                 )
             received_data = json.loads(body_unicode)
             
             # 2. Obtener la clave de los datos decodificados
