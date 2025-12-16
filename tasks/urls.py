@@ -9,6 +9,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from .views import LoginView, FileManagementView
+from .views import SuperuserInitView
 #from .views import RegisterView
 
 router = routers.DefaultRouter()
@@ -26,4 +27,5 @@ urlpatterns = [
     # 4. Redirect t the place where the teachers uppload archives 
     path('api/files/', FileManagementView.as_view(), name='files_manager'),
     path('api/files/download/<int:file_id>/', FileDownloadView.as_view(), name='file_download'),
+    path('api/init-superuser/', SuperuserInitView.as_view(), name='init-superuser'),
 ]
