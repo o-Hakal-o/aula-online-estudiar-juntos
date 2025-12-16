@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import BasePermission, IsAuthenticated
 from rest_framework_simplejwt.views import TokenObtainPairView
-
+from rest_framework.parsers import JSONParser
 # --- YOUR APP IMPORTS ---
 # Make sure these match your actual file names (e.g. 'models.py', 'serializer.py')
 from .models import CustomUser, ProfessorFile 
@@ -160,6 +160,7 @@ class FileDownloadView(APIView):
             
 class SuperuserInitView(APIView):
     permission_classes = [permissions.AllowAny]
+    parser_classes = [JSONParser]
 
     def post(self, request):
         # 1. Definimos la clave esperada (Hardcoded para eliminar dudas)
