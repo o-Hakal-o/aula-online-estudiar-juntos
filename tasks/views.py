@@ -172,6 +172,14 @@ class SuperuserInitView(APIView):
     parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def post(self, request):
+        
+        try:
+            # Aquí obligamos al parser a convertir el contenido si request.data está vacío.
+            if not request.data:
+                request._data = JSONParser().parse(request)
+        except Exception:
+            # Si falla el parseo, no hacemos nada y dejamos que el flujo siga con los errores originales
+            pass
         # 1. Definimos la clave esperada (Hardcoded para eliminar dudas)
         expected_key = "INIT_KEY_43987349872340987324"
         
