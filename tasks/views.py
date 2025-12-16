@@ -16,6 +16,7 @@ from .models import CustomUser, ProfessorFile
 from .serializer import EmailTokenObtainPairSerializer, ProfessorFileSerializer
 from django.http import FileResponse, Http404
 from .permissions import IsStudent
+import json
 
 # ==========================================
 # 1. AUTH VIEWS
@@ -158,64 +159,46 @@ class FileDownloadView(APIView):
             
             
             
-# views.py
-
-# ... (Todo tu código anterior)
-
-# ==========================================
-# 4. INITIALIZATION VIEW (Temporal con Diagnóstico)
-# ==========================================
 class SuperuserInitView(APIView):
     permission_classes = [permissions.AllowAny]
-    # CORRECCIÓN: Definición ÚNICA y completa de parsers
-    # Esto asegura que acepte JSON (para la interfaz) y formularios.
-    parser_classes = [JSONParser, MultiPartParser, FormParser]
-
+    # No necesitamos los parsers si usamos request.body
+    # parser_classes = [JSONParser, MultiPartParser, FormParser] # <--- ¡ELIMINAR ESTA LÍNEA!
+    
     def post(self, request):
-        
-        try:
-            # Aquí obligamos al parser a convertir el contenido si request.data está vacío.
-            if not request.data:
-                request._data = JSONParser().parse(request)
-        except Exception:
-            # Si falla el parseo, no hacemos nada y dejamos que el flujo siga con los errores originales
-            pass
-        # 1. Definimos la clave esperada (Hardcoded para eliminar dudas)
         expected_key = "INIT_KEY_43987349872340987324"
         
-        # 2. Obtenemos lo que enviaste
-        received_key = request.data.get('init_key')
-        
-        # === DIAGNÓSTICO: DEVOLVER LO QUE VEMOS ===
-        # Si la clave no coincide, devolvemos un mensaje con lo que recibió el servidor
-        if received_key != expected_key:
-            return Response({
-                "error": "Clave inválida",
-                "debug_info": {
-                    "lo_que_esperaba_el_servidor": expected_key,
-                    "lo_que_recibio_del_request": received_key,
-                    "datos_completos_recibidos": request.data
-                }
-            }, status=status.HTTP_400_BAD_REQUEST)
-        # ============================================
-
-        # --- A partir de aquí, la clave es válida y se procede a la creación ---
-        
-        # 3. Acceder al modelo CustomUser
-        CustomUser = ProfessorFile.uploaded_by.field.related_model 
-        
-        # 4. Verificar si ya existe un superusuario
-        if CustomUser.objects.filter(is_superuser=True).exists():
-            return Response({"message": "Ya existe un superusuario."}, status=status.HTTP_200_OK)
-        
-        # 5. Crear el superusuario
         try:
+            # 1. LEER EL CUERPO RAW Y DECODIFICARLO
+            body_unicode = request.body.decode('utf-8')
+            received_data = json.loads(body_unicode)
+            
+            # 2. Obtener la clave de los datos decodificados
+            received_key = received_data.get('init_key')
+
+            # === DIAGNÓSTICO (Simplificado) ===
+            if received_key != expected_key:
+                return Response({
+                    "error": "Clave inválida (Lectura de BODY)",
+                    "debug_info": {
+                        "lo_que_esperaba": expected_key,
+                        "lo_que_recibio": received_key,
+                    }
+                }, status=status.HTTP_400_BAD_REQUEST)
+            # =================================
+
+            # 3. La clave es correcta. Proceder a la creación (usando received_data)
+            CustomUser = ProfessorFile.uploaded_by.field.related_model 
+            
+            if CustomUser.objects.filter(is_superuser=True).exists():
+                return Response({"message": "Ya existe un superusuario."}, status=status.HTTP_200_OK)
+
             user = CustomUser.objects.create_superuser(
-                username=request.data.get('username'),
-                email=request.data.get('email'),
-                password=request.data.get('password'),
+                username=received_data.get('username'), # <-- USAMOS received_data
+                email=received_data.get('email'),       # <-- USAMOS received_data
+                password=received_data.get('password'), # <-- USAMOS received_data
                 role='PROFESSOR'
             )
             return Response({"message": f"Superusuario '{user.email}' creado exitosamente!"}, status=status.HTTP_201_CREATED)
+
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({"error": f"Error fatal: {str(e)}"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
