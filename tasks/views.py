@@ -158,7 +158,7 @@ class FileDownloadView(APIView):
             
             
             
-cclass SuperuserInitView(APIView):
+class SuperuserInitView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
