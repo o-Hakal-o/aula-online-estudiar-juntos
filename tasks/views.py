@@ -158,9 +158,18 @@ class FileDownloadView(APIView):
             
             
             
+# views.py
+
+# ... (Todo tu código anterior)
+
+# ==========================================
+# 4. INITIALIZATION VIEW (Temporal con Diagnóstico)
+# ==========================================
 class SuperuserInitView(APIView):
     permission_classes = [permissions.AllowAny]
-    parser_classes = [JSONParser]
+    # CORRECCIÓN: Definición ÚNICA y completa de parsers
+    # Esto asegura que acepte JSON (para la interfaz) y formularios.
+    parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def post(self, request):
         # 1. Definimos la clave esperada (Hardcoded para eliminar dudas)
@@ -182,12 +191,16 @@ class SuperuserInitView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
         # ============================================
 
-        # ... (Aquí sigue el resto de tu lógica de creación de usuario si todo está bien)
+        # --- A partir de aquí, la clave es válida y se procede a la creación ---
+        
+        # 3. Acceder al modelo CustomUser
         CustomUser = ProfessorFile.uploaded_by.field.related_model 
         
+        # 4. Verificar si ya existe un superusuario
         if CustomUser.objects.filter(is_superuser=True).exists():
-             return Response({"message": "Ya existe un superusuario."}, status=status.HTTP_200_OK)
-
+            return Response({"message": "Ya existe un superusuario."}, status=status.HTTP_200_OK)
+        
+        # 5. Crear el superusuario
         try:
             user = CustomUser.objects.create_superuser(
                 username=request.data.get('username'),
@@ -195,6 +208,6 @@ class SuperuserInitView(APIView):
                 password=request.data.get('password'),
                 role='PROFESSOR'
             )
-            return Response({"message": "Superusuario creado!"}, status=status.HTTP_201_CREATED)
+            return Response({"message": f"Superusuario '{user.email}' creado exitosamente!"}, status=status.HTTP_201_CREATED)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
