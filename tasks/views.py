@@ -158,70 +158,42 @@ class FileDownloadView(APIView):
             
             
             
-class SuperuserInitView(APIView):
-    # No necesita permisos si se verifica la clave secreta
+cclass SuperuserInitView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        # 1. Obtener la clave de entorno y aplicar el HACK de prueba
-        init_key = os.environ.get('SUPERUSER_INIT_KEY')
+        # 1. Definimos la clave esperada (Hardcoded para eliminar dudas)
+        expected_key = "INIT_KEY_43987349872340987324"
         
-        # --- HACK TEMPORAL PARA FORZAR LA CLAVE EN CASO DE FALLA DE ENTORNO ---
-        # Si el valor no se está cargando, lo forzamos solo para esta prueba
-        # ESTO DEBE SER ELIMINADO UNA VEZ CREADO EL SUPERUSUARIO
-        if not init_key:
-             init_key = "INIT_KEY_43987349872340987324" 
-        if request.data.get('init_key') == init_key:
-            return Response(
-                {"status": "CLAVE VALIDADA", "proximo_paso": "Procediendo a verificar usuario."}, 
-                status=status.HTTP_200_OK
-            )
-        # ---------------------------------------------------------------------
+        # 2. Obtenemos lo que enviaste
+        received_key = request.data.get('init_key')
+        
+        # === DIAGNÓSTICO: DEVOLVER LO QUE VEMOS ===
+        # Si la clave no coincide, devolvemos un mensaje con lo que recibió el servidor
+        if received_key != expected_key:
+            return Response({
+                "error": "Clave inválida",
+                "debug_info": {
+                    "lo_que_esperaba_el_servidor": expected_key,
+                    "lo_que_recibio_del_request": received_key,
+                    "datos_completos_recibidos": request.data
+                }
+            }, status=status.HTTP_400_BAD_REQUEST)
+        # ============================================
 
-        # 2. Seguridad CRÍTICA: Verificar si la clave de la solicitud coincide
-        # Si la clave es None (falló el entorno) O la clave no coincide, denegar.
-        if init_key is None or request.data.get('init_key') != init_key:
-            return Response(
-                {"error": "Clave de inicialización inválida o faltante."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        # ... (Aquí sigue el resto de tu lógica de creación de usuario si todo está bien)
+        CustomUser = ProfessorFile.uploaded_by.field.related_model 
         
-        # 3. Acceder al modelo CustomUser (asumiendo que CustomUser está importado de .models)
-        # Usamos la importación directa que ya tienes arriba: from .models import CustomUser 
-        CustomUser = ProfessorFile.uploaded_by.field.related_model
-        
-        # 4. Verificar si ya existe un superusuario (para evitar errores de unicidad)
         if CustomUser.objects.filter(is_superuser=True).exists():
-             return Response(
-                 {"message": "Ya existe un superusuario. Inicialización cancelada."}, 
-                 status=status.HTTP_200_OK
-            )
+             return Response({"message": "Ya existe un superusuario."}, status=status.HTTP_200_OK)
 
-        # 5. Extraer y validar los datos
-        username = request.data.get('username')
-        email = request.data.get('email')
-        password = request.data.get('password')
-
-        if not all([username, email, password]):
-            return Response(
-                {"error": "Faltan datos (username, email, password)."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        # 6. Crear el superusuario
         try:
             user = CustomUser.objects.create_superuser(
-                username=username,
-                email=email,
-                password=password,
-                role='PROFESSOR' 
+                username=request.data.get('username'),
+                email=request.data.get('email'),
+                password=request.data.get('password'),
+                role='PROFESSOR'
             )
-            return Response(
-                {"message": f"Superusuario '{user.email}' creado exitosamente."},
-                status=status.HTTP_201_CREATED
-            )
+            return Response({"message": "Superusuario creado!"}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            return Response(
-                {"error": f"Error al crear el usuario: {str(e)}"},
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
