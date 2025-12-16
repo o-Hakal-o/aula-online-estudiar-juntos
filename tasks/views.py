@@ -166,7 +166,7 @@ from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 class SuperuserInitView(APIView):
     permission_classes = [permissions.AllowAny]
     # Usar SOLO JSONParser (o la lista completa, si es necesaria globalmente)
-    parser_classes = [JSONParser] 
+    parser_classes = [MultiPartParser, FormParser] 
     # Si sigue fallando, prueba con: parser_classes = [JSONParser, MultiPartParser, FormParser]
 
     def post(self, request):
