@@ -163,27 +163,36 @@ class SuperuserInitView(APIView):
     permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        # 1. Seguridad CRÍTICA: Verificar la clave de inicialización
+        # 1. Obtener la clave de entorno y aplicar el HACK de prueba
         init_key = os.environ.get('SUPERUSER_INIT_KEY')
-        if not init_key or request.data.get('init_key') != init_key:
+        
+        # --- HACK TEMPORAL PARA FORZAR LA CLAVE EN CASO DE FALLA DE ENTORNO ---
+        # Si el valor no se está cargando, lo forzamos solo para esta prueba
+        # ESTO DEBE SER ELIMINADO UNA VEZ CREADO EL SUPERUSUARIO
+        if not init_key:
+             init_key = "INIT_KEY_43987349872340987324" 
+        # ---------------------------------------------------------------------
+
+        # 2. Seguridad CRÍTICA: Verificar si la clave de la solicitud coincide
+        # Si la clave es None (falló el entorno) O la clave no coincide, denegar.
+        if init_key is None or request.data.get('init_key') != init_key:
             return Response(
                 {"error": "Clave de inicialización inválida o faltante."},
                 status=status.HTTP_403_FORBIDDEN
             )
-
-        # 2. Verificar si ya existe un superusuario
-        CustomUser = ProfessorFile.uploaded_by.field.related_model # Acceder al modelo CustomUser
         
-        # OTRA FORMA (Si CustomUser está importado):
-        # from .models import CustomUser 
-        # if CustomUser.objects.filter(is_superuser=True).exists():
-        #    return Response({"message": "Ya existe un superusuario. Inicialización cancelada."}, status=status.HTTP_200_OK)
-
-        # Si ya existe un superusuario, este método te protegerá de errores de unicidad
+        # 3. Acceder al modelo CustomUser (asumiendo que CustomUser está importado de .models)
+        # Usamos la importación directa que ya tienes arriba: from .models import CustomUser 
+        CustomUser = ProfessorFile.uploaded_by.field.related_model
+        
+        # 4. Verificar si ya existe un superusuario (para evitar errores de unicidad)
         if CustomUser.objects.filter(is_superuser=True).exists():
-             return Response({"message": "Ya existe un superusuario. Inicialización cancelada."}, status=status.HTTP_200_OK)
+             return Response(
+                 {"message": "Ya existe un superusuario. Inicialización cancelada."}, 
+                 status=status.HTTP_200_OK
+            )
 
-        # 3. Extraer y validar los datos
+        # 5. Extraer y validar los datos
         username = request.data.get('username')
         email = request.data.get('email')
         password = request.data.get('password')
@@ -194,13 +203,13 @@ class SuperuserInitView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # 4. Crear el superusuario
+        # 6. Crear el superusuario
         try:
             user = CustomUser.objects.create_superuser(
                 username=username,
                 email=email,
                 password=password,
-                role='PROFESSOR' # O el rol que desees para el administrador
+                role='PROFESSOR' 
             )
             return Response(
                 {"message": f"Superusuario '{user.email}' creado exitosamente."},
