@@ -171,6 +171,11 @@ class SuperuserInitView(APIView):
         # ESTO DEBE SER ELIMINADO UNA VEZ CREADO EL SUPERUSUARIO
         if not init_key:
              init_key = "INIT_KEY_43987349872340987324" 
+        if request.data.get('init_key') == init_key:
+            return Response(
+                {"status": "CLAVE VALIDADA", "proximo_paso": "Procediendo a verificar usuario."}, 
+                status=status.HTTP_200_OK
+            )
         # ---------------------------------------------------------------------
 
         # 2. Seguridad CRÍTICA: Verificar si la clave de la solicitud coincide
