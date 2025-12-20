@@ -185,16 +185,14 @@ SIMPLE_JWT = {
 }
 
 
+# Usamos variables de entorno para seguridad
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_USE_SSL = False  # Asegúrate de que esto sea False si usas TLS/587
-
-# Carga segura desde variables de entorno
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
-DEFAULT_FROM_EMAIL = f'ITTackknowledge <{EMAIL_HOST_USER}>'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 
-# Tiempo de espera para evitar que el worker muera sin avisar
+# Añade este timeout para que Django no se quede "congelado" si falla la conexión
 EMAIL_TIMEOUT = 10
