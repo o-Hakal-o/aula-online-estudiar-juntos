@@ -147,7 +147,7 @@ STATIC_URL = '/static/'
 # This production code might break development mode, so we check whether we're in DEBUG mode
 if not DEBUG:
     # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
-    STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
     # Enable the WhiteNoise storage backend, which compresses static files to reduce disk use
     # and renames the files with unique names for each version to support long-term caching
@@ -187,12 +187,11 @@ SIMPLE_JWT = {
 }
 
 
-# settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 465               # Cambiamos a 465
-EMAIL_USE_TLS = False          # Desactivamos TLS
-EMAIL_USE_SSL = True           # Activamos SSL
+EMAIL_PORT = 587                # Volvemos a 587
+EMAIL_USE_TLS = True            # Usamos TLS
+EMAIL_USE_SSL = False           # SSL debe ser False si TLS es True
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
-EMAIL_TIMEOUT = 30             # Le damos más tiempo a Django antes de rendirse
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS').replace(" ", "") # Limpieza de seguridad
+EMAIL_TIMEOUT = 10              # Tiempo corto para que NO congele el server si falla
