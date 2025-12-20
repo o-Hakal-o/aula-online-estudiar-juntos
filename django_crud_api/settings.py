@@ -139,24 +139,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-# 1. Donde Django buscará archivos estáticos durante el desarrollo
 STATIC_URL = '/static/'
 
-# 2. Carpeta raíz del proyecto donde tienes tus archivos (CSS, JS manuales)
-STATICFILES_DIRS = [
-    BASE_DIR / 'static', 
-]
 
-# 3. Carpeta donde Django REUNIRÁ todos los archivos para producción
-# DEBE ser diferente a las carpetas en STATICFILES_DIRS
-STATIC_ROOT = BASE_DIR / 'staticfiles'
-
-# 4. Configuración de WhiteNoise para comprimir archivos
-STORAGES = {
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
-    },
-}
 # This production code might break development mode, so we check whether we're in DEBUG mode
 if not DEBUG:
     # Tell Django to copy static assets into a path called `staticfiles` (this is specific to Render)
