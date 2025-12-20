@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 from pathlib import Path
 import os
-from .env import load_env
+from dotenv import load_dotenv
 from datetime import timedelta
 import dj_database_url 
 load_dotenv()
