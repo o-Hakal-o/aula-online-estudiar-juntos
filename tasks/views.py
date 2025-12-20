@@ -181,45 +181,45 @@ class PasswordResetRequestView(APIView):
         serializer = PasswordResetRequestSerializer(data=request.data)
         if serializer.is_valid():
             email = serializer.validated_data['email']
-            user = CustomUser.objects.get(email=email)
-            
-            token = default_token_generator.make_token(user)
-            uid = urlsafe_base64_encode(force_bytes(user.pk))
-            
-            # URL que apunta a tu frontend
-            reset_url = f"http://localhost:3000/reset-password/{uid}/{token}/"
+            try:
+                user = CustomUser.objects.get(email=email)
+                token = default_token_generator.make_token(user)
+                uid = urlsafe_base64_encode(force_bytes(user.pk))
+                
+                # IMPORTANTE: Cambia localhost:3000 por tu URL de Render si ya estás en producción
+                reset_url = f"https://ittac.onrender.com/tasks/auth/password-reset-confirm/{uid}/{token}/"
 
-            # Contexto para la plantilla
-            context = {
-                'user': user,
-                'reset_url': reset_url,
-            }
+                context = {
+                    'user': user,
+                    'reset_url': reset_url,
+                }
 
-            # 1. Renderizar el HTML
-            html_content = render_to_string('emails/password_reset_email.html', context)
-            
-            # 2. Crear una versión en texto plano (quitando las etiquetas HTML)
-            text_content = strip_tags(html_content)
+                html_content = render_to_string('emails/password_reset_email.html', context)
+                text_content = strip_tags(html_content)
 
-            # 3. Configurar el correo
-            subject = "Recuperación de Contraseña - Mi App"
-            from_email = "no-reply@tuapp.com"
-            
-            msg = EmailMultiAlternatives(subject, text_content, from_email, [email])
-            msg.attach_alternative(html_content, "text/html") # Aquí se añade el HTML
-            
-            msg.send()
+                subject = "Recuperación de Contraseña - Ittac"
+                # CAMBIO CRÍTICO: Debe ser tu correo de Gmail configurado en las variables
+                from_email = os.environ.get('EMAIL_USER') 
+                
+                msg = EmailMultiAlternatives(subject, text_content, from_email, [email])
+                msg.attach_alternative(html_content, "text/html")
+                
+                # fail_silently=False nos ayudará a ver el error real en los logs
+                msg.send(fail_silently=False)
 
-            return Response(
-                {"message": "Correo enviado con éxito."},
-                status=status.HTTP_200_OK
-            )
+                return Response(
+                    {"message": "Correo enviado con éxito."},
+                    status=status.HTTP_200_OK
+                )
+            except CustomUser.DoesNotExist:
+                return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+            except Exception as e:
+                # Esto evita que el servidor se "congele" y te escupe el error en el JSON
+                return Response(
+                    {"error": "Fallo al enviar correo", "details": str(e)}, 
+                    status=status.HTTP_500_INTERNAL_SERVER_ERROR
+                )
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-from django.utils.http import urlsafe_base64_decode
-from django.utils.encoding import force_str
-from django.contrib.auth.tokens import default_token_generator
-from .serializer import PasswordResetConfirmSerializer
 
 class PasswordResetConfirmView(APIView):
     permission_classes = [permissions.AllowAny]
