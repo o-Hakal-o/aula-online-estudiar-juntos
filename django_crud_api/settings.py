@@ -185,14 +185,12 @@ SIMPLE_JWT = {
 }
 
 
-# Usamos variables de entorno para seguridad
+# settings.py
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = True
+EMAIL_PORT = 465               # Cambiamos a 465
+EMAIL_USE_TLS = False          # Desactivamos TLS
+EMAIL_USE_SSL = True           # Activamos SSL
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS')
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-
-# Añade este timeout para que Django no se quede "congelado" si falla la conexión
-EMAIL_TIMEOUT = 10
+EMAIL_TIMEOUT = 30             # Le damos más tiempo a Django antes de rendirse
