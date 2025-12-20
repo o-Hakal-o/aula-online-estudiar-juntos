@@ -28,7 +28,7 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     
     #Define required fields (excluding email/password) for createsuperuser
-    REQUIRED_FIELDS = ['role', 'username']
+    REQUIRED_FIELDS = ['role', 'username',]
     
     # You  generally don't need to redefine name/email/password fields, 
     # as AbstractUser already provides first_name, last_name, email, and password.

@@ -190,9 +190,9 @@ SIMPLE_JWT = {
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587                # Volvemos a 587
-EMAIL_USE_TLS = True            # Usamos TLS
-EMAIL_USE_SSL = False           # SSL debe ser False si TLS es True
+EMAIL_PORT = 465                # Puerto para SSL
+EMAIL_USE_TLS = False           # Desactivar TLS para usar SSL directo
+EMAIL_USE_SSL = True            # Activar SSL
 EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
-EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS').replace(" ", "") # Limpieza de seguridad
-EMAIL_TIMEOUT = 10              # Tiempo corto para que NO congele el server si falla
+EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASS').replace(" ", "")
+EMAIL_TIMEOUT = 20           # Tiempo corto para que NO congele el server si falla
