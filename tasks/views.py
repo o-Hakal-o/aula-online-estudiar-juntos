@@ -173,6 +173,7 @@ from .serializer import PasswordResetRequestSerializer
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from django.conf import settings
 
 class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
@@ -199,7 +200,7 @@ class PasswordResetRequestView(APIView):
 
                 subject = "Recuperación de Contraseña - Ittac"
                 # CAMBIO CRÍTICO: Debe ser tu correo de Gmail configurado en las variables
-                from_email = os.environ.get('EMAIL_USER') 
+                from_email = settings.EMAIL_HOST_USER
                 
                 msg = EmailMultiAlternatives(subject, text_content, from_email, [email])
                 msg.attach_alternative(html_content, "text/html")
