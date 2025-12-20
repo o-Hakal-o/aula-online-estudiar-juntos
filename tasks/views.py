@@ -159,5 +159,98 @@ class FileDownloadView(APIView):
             
             
             
-from rest_framework.parsers import JSONParser, MultiPartParser, FormParser
 
+
+
+
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.template.loader import render_to_string
+from .serializer import PasswordResetRequestSerializer
+
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+
+class PasswordResetRequestView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            user = CustomUser.objects.get(email=email)
+            
+            token = default_token_generator.make_token(user)
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            
+            # URL que apunta a tu frontend
+            reset_url = f"http://localhost:3000/reset-password/{uid}/{token}/"
+
+            # Contexto para la plantilla
+            context = {
+                'user': user,
+                'reset_url': reset_url,
+            }
+
+            # 1. Renderizar el HTML
+            html_content = render_to_string('emails/password_reset_email.html', context)
+            
+            # 2. Crear una versión en texto plano (quitando las etiquetas HTML)
+            text_content = strip_tags(html_content)
+
+            # 3. Configurar el correo
+            subject = "Recuperación de Contraseña - Mi App"
+            from_email = "no-reply@tuapp.com"
+            
+            msg = EmailMultiAlternatives(subject, text_content, from_email, [email])
+            msg.attach_alternative(html_content, "text/html") # Aquí se añade el HTML
+            
+            msg.send()
+
+            return Response(
+                {"message": "Correo enviado con éxito."},
+                status=status.HTTP_200_OK
+            )
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.contrib.auth.tokens import default_token_generator
+from .serializer import PasswordResetConfirmSerializer
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = [permissions.AllowAny]
+
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        if serializer.is_valid():
+            uid = serializer.validated_data['uid']
+            token = serializer.validated_data['token']
+            new_password = serializer.validated_data['new_password']
+
+            try:
+                # 1. Decodificar el UID para obtener el ID real del usuario
+                id_usuario = force_str(urlsafe_base64_decode(uid))
+                user = CustomUser.objects.get(pk=id_usuario)
+            except (TypeError, ValueError, OverflowError, CustomUser.DoesNotExist):
+                user = None
+
+            # 2. Verificar si el token es válido para ese usuario
+            if user is not None and default_token_generator.check_token(user, token):
+                # 3. Cambiar la contraseña de forma segura
+                user.set_password(new_password)
+                user.save()
+                return Response(
+                    {"message": "Tu contraseña ha sido restablecida con éxito."},
+                    status=status.HTTP_200_OK
+                )
+            else:
+                return Response(
+                    {"error": "El enlace es inválido o ha expirado."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

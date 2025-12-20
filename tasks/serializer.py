@@ -30,3 +30,29 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
          read_only_fields = ['uploaded_by', 'uploaded_at']
    
    
+
+
+from django.contrib.auth.forms import PasswordResetForm
+from rest_framework import serializers
+
+class PasswordResetRequestSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+
+    class Meta:
+        fields = ['email']
+
+    def validate_email(self, value):
+        # Opcional: Validar si el usuario existe antes de intentar enviar
+        if not CustomUser.objects.filter(email=value).exists():
+            raise serializers.ValidationError("No existe un usuario con este correo electrónico.")
+        return value
+
+class PasswordResetConfirmSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    new_password = serializers.CharField(min_length=8, write_only=True)
+
+    def validate(self, data):
+        # Aquí podrías agregar una validación para confirmar que las dos 
+        # contraseñas coincidan si decides pedir "repetir contraseña"
+        return data
