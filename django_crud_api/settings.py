@@ -54,12 +54,22 @@ INSTALLED_APPS = [
     "corsheaders",
     'coreapi',
     'django_extensions',
+    'cloudinary_storage',
+    'cloudinary',
     'tasks',
     'rest_framework_simplejwt',
     
      
     
 ]
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",  # Debe ir lo más arriba posible
@@ -187,7 +197,7 @@ SIMPLE_JWT = {
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
-
+ 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465                # Puerto para SSL

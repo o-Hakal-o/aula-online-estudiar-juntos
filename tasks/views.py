@@ -176,7 +176,10 @@ from django.utils.html import strip_tags
 from django.conf import settings
 
 class PasswordResetRequestView(APIView):
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.AllowAny]a
+    
+    
+    
 
     def post(self, request):
         serializer = PasswordResetRequestSerializer(data=request.data)
