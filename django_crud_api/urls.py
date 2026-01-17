@@ -23,4 +23,5 @@ urlpatterns = [
     path('tasks/' , include ('tasks.urls'))
 ]
 
-urlpatterns = urlpatterns  + static(settings.MEDIA_URL , document_root = settings.MEDIA_URL)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
