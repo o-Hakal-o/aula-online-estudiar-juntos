@@ -109,11 +109,13 @@ WSGI_APPLICATION = 'django_crud_api.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+
+
 DATABASES = {
     'default': dj_database_url.config(
-        # **Asegúrate de que esta cadena coincida con tu DB local de PostgreSQL**
-        # Si usas un usuario/contraseña diferente, cámbialo.
-        default='postgresql://postgres:Hakal2004*@localhost:5432/Ittac', 
+        # 1. En Render, esto tomará automáticamente la variable de entorno DATABASE_URL.
+        # 2. En local, si no tienes variable de entorno, usará SQLite por defecto para no fallar.
+        default='sqlite:///db.sqlite3', 
         conn_max_age=600
     )
 }
