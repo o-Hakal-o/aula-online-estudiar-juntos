@@ -157,22 +157,26 @@ USE_TZ = True
 
 
 
+# --- ARCHIVOS ESTÁTICOS (CSS, JS, Imágenes del proyecto) ---
+STATIC_URL = '/static/'
+
+# 1. Esto le dice a Django dónde buscar tu carpeta 'static' de la raíz
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
-# 2. Donde se reunirán para Render
+# 2. Donde se guardarán para producción (Render)
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATIC_URL = '/static/'
 
-# 3. Al usar Cloudinary, estas variables son OBLIGATORIAS para la librería
+# 3. Al usar Cloudinary + WhiteNoise, esta configuración es la que no falla:
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+WHITENOISE_USE_FINDERS = True
+
+# --- ARCHIVOS MEDIA (Subidas de usuarios a Cloudinary) ---
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# 4. Archivos Media
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'static')
-
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Default primary key field type
