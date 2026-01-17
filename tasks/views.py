@@ -164,3 +164,24 @@ class PasswordResetConfirmView(APIView):
             else:
                 return Response({"error": "Token inválido."}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+
+from django.http import HttpResponse
+from django.contrib.auth import get_user_model
+
+def create_admin_temporal(request):
+    User = get_user_model()
+    email = "itacknowledge@gmail.com"
+    password = "TuPasswordSegura123" # <--- Cámbiala aquí
+    
+    if not User.objects.filter(email=email).exists():
+        User.objects.create_superuser(
+            email=email, 
+            password=password,
+            username="admin" # Si tu modelo usa username, si no, bórralo
+        )
+        return HttpResponse(f"¡Éxito! Superusuario {email} creado correctamente.")
+    else:
+        return HttpResponse("El usuario ya existe en la base de datos.")
