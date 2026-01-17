@@ -8,7 +8,7 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 
 # Importaciones de tu app
 from .models import CustomUser, ProfessorFile 
-from .serializer import CustomTokenObtainPairSerializer, ProfessorFileSerializer, PasswordResetRequestSerializer, PasswordResetConfirmSerializer
+from .serializers import CustomTokenObtainPairSerializer, ProfessorFileSerializer, PasswordResetRequestSerializer, PasswordResetConfirmSerializer
 from .permissions import IsStudentOrProfessor, IsStudent
 
 # Para el reset de password
