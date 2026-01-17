@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from .views import LoginView, FileManagementView , PasswordResetRequestView ,PasswordResetConfirmView
-
+from .views import create_admin_temporal
 #from .views import RegisterView
 
 router = routers.DefaultRouter()
