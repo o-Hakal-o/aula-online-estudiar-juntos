@@ -113,10 +113,8 @@ WSGI_APPLICATION = 'django_crud_api.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        # 1. En Render, esto tomará automáticamente la variable de entorno DATABASE_URL.
-        # 2. En local, si no tienes variable de entorno, usará SQLite por defecto para no fallar.
-        default='sqlite:///db.sqlite3', 
-        conn_max_age=600
+        conn_max_age=600,
+        conn_health_checks=True,
     )
 }
 
