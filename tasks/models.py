@@ -1,7 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser
-
+from cloudinary.models import CloudinaryField
 class CustomUser(AbstractUser):
     # Email único y obligatorio
     email = models.EmailField(unique=True, blank=False)
