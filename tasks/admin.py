@@ -21,5 +21,5 @@ admin.site.register(CustomUser, CustomUserAdmin)
 
 @admin.register(ProfessorFile)
 class ProfessorFileAdmin(admin.ModelAdmin):
-    list_display = ('file', 'uploaded_by', 'uploaded_at')
-    list_filter = ('uploaded_by__role',) # Filter files by role
+    list_display = ('title', 'uploaded_by', 'uploaded_at') 
+    list_filter = ('uploaded_by',) # Filtrar por el usuario directamente
