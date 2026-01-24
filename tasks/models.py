@@ -31,10 +31,10 @@ class ProfessorFile(models.Model):
         on_delete=models.CASCADE,
         related_name='files'
     )
-    # upload_to indica la carpeta dentro de Cloudinary
-    
+    # Cambiamos a FileField porque el storage global ya es Cloudinary
+    file = models.FileField(upload_to='professor_uploads/')
     title = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    file = CloudinaryField(resource_type='raw', folder='professor_uploads/')
+
     def __str__(self):
         return f"{self.title} - {self.uploaded_by.email}"

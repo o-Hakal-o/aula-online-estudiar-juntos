@@ -24,3 +24,22 @@ class IsStudentOrProfessor(permissions.BasePermission):
              # Opcional: Si quieres ver qué rol está fallando, puedes imprimirlo
              # print(f"Acceso denegado. Rol del usuario: {user.role}")
              return False
+
+
+
+class IsProfessorOrReadOnly(permissions.BasePermission):
+    """
+    - Cualquier usuario autenticado (Estudiante o Profesor) puede ver (GET).
+    - Solo los PROFESSORES pueden crear (POST) o eliminar (DELETE).
+    """
+    def has_permission(self, request, view):
+        # 1. CANDADO MAESTRO: ¿Tiene Token válido?
+        if not request.user or not request.user.is_authenticated:
+            return False
+
+        # 2. Si el método es de lectura (GET, HEAD, OPTIONS), dejamos pasar a cualquiera autenticado
+        if request.method in permissions.SAFE_METHODS:
+            return True
+
+        # 3. Si quiere escribir (POST, DELETE), DEBE ser PROFESSOR
+        return request.user.role == 'PROFESSOR'

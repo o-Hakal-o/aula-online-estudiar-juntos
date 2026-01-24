@@ -19,6 +19,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
+from django.core.mail import send_mail, EmailMultiAlternatives # Añade send_mail
 
 # ==========================================
 # 1. AUTH VIEWS
@@ -50,14 +51,18 @@ class IsProfessorOrReadOnly(BasePermission):
 # ==========================================
 
 class FileManagementView(APIView):
+    # Usamos el permiso nuevo. Esto garantiza Token SIEMPRE.
+    permission_classes = [IsProfessorOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
-    
 
     def get(self, request):
+        # Gracias a IsProfessorOrReadOnly, ya sabemos que request.user existe
         if request.user.role == 'PROFESSOR':
+            # El profesor ve SOLO sus archivos
             files = ProfessorFile.objects.filter(uploaded_by=request.user)
             message = "Tus archivos subidos."
         else:
+            # El estudiante ve TODOS los archivos (según tu lógica original)
             files = ProfessorFile.objects.all()
             message = "Archivos disponibles."
 
@@ -65,6 +70,8 @@ class FileManagementView(APIView):
         return Response({"message": message, "data": serializer.data}, status=status.HTTP_200_OK)
 
     def post(self, request):
+        # El permiso IsProfessorOrReadOnly ya bloqueó a los estudiantes aquí.
+        # Solo entran profesores.
         serializer = ProfessorFileSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(uploaded_by=request.user)
@@ -72,36 +79,44 @@ class FileManagementView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
-        file_id = request.query_params.get('id')
+        # El permiso IsProfessorOrReadOnly ya bloqueó a los estudiantes aquí.
+        
+        # OJO: request.query_params es mejor práctica que request.data para GET/DELETE
+        file_id = request.query_params.get('id') 
+        
         if not file_id:
             return Response({"error": "Falta el ID (?id=1)"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # Buscamos el archivo que pertenezca al profesor logueado
+            # CANDADO FINAL: Solo permitimos borrar si el archivo pertenece al usuario actual
             file_obj = ProfessorFile.objects.get(id=file_id, uploaded_by=request.user)
             
-            # Al usar django-cloudinary-storage, llamar a .delete() en el modelo
-            # debería encargarse de borrarlo de la nube si está bien configurado.
+            # Borrado lógico y físico (Cloudinary)
             file_obj.delete()
             
-            return Response({"message": "Archivo eliminado."}, status=status.HTTP_204_NO_CONTENT)
+            return Response({"message": "Archivo eliminado correctamente."}, status=status.HTTP_204_NO_CONTENT)
+            
         except ProfessorFile.DoesNotExist:
-            return Response({"error": "Archivo no encontrado o no autorizado."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Archivo no encontrado o no tienes permiso para eliminarlo."}, 
+                status=status.HTTP_404_NOT_FOUND
+            )
 
 
 class FileDownloadView(APIView):
-    class FileDownloadView(APIView):
-        permission_classes = [IsStudentOrProfessor]
-
+    # Al usar tu permiso personalizado que revisa is_authenticated,
+    # el token es obligatorio aquí.
+    permission_classes = [IsStudentOrProfessor]
+    
     def get(self, request, file_id, format=None):
         try:
             file_instance = ProfessorFile.objects.get(pk=file_id)
             
+            # Verificamos si existe el archivo físico/link
             if file_instance.file:
-                # Cloudinary ya entrega la URL absoluta. No necesitas build_absolute_uri
                 download_url = file_instance.file.url
                 
-                # Opcional: Si quieres forzar la descarga inmediata
+                # Transformación de Cloudinary para forzar descarga
                 if ".cloudinary.com" in download_url:
                     download_url = download_url.replace("/upload/", "/upload/fl_attachment/")
 
@@ -110,10 +125,14 @@ class FileDownloadView(APIView):
                     "title": file_instance.title
                 }, status=status.HTTP_200_OK)
             else:
-                return Response({"error": "No hay archivo"}, status=status.HTTP_404_NOT_FOUND)
-
+                return Response({"error": "No hay archivo adjunto"}, status=status.HTTP_404_NOT_FOUND)
+                
         except ProfessorFile.DoesNotExist:
-            return Response({"detail": "No existe."}, status=status.HTTP_404_NOT_FOUND)
+            return Response({"detail": "El archivo no existe."}, status=status.HTTP_404_NOT_FOUND)
+        
+        
+        
+        
         
         
         
