@@ -50,8 +50,8 @@ class IsProfessorOrReadOnly(BasePermission):
 # ==========================================
 
 class FileManagementView(APIView):
-    permission_classes = [IsProfessorOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
+    
 
     def get(self, request):
         if request.user.role == 'PROFESSOR':
