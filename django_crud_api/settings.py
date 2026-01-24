@@ -158,9 +158,7 @@ USE_TZ = True
 
 # --- CONFIGURACIÓN DE ARCHIVOS (ESTÁTICOS Y MEDIA) ---
 
-WHITENOISE_MANIFEST_STRICT = False
-
-# 1. Definición para archivos estáticos (CSS, JS) usando WhiteNoise
+# 1. Definición para archivos estáticos (CSS, JS)
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
@@ -169,18 +167,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# 3. CAMBIO CRÍTICO: Usamos 'CompressedStaticFilesStorage' (SIN Manifest)
-# Esto evita el error de "MissingFileError" porque no chequea referencias internas.
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
+# 3. VARIABLES DE COMPATIBILIDAD (Solución: Usamos almacenamiento BÁSICO)
+# Usamos 'StaticFilesStorage' a secas. Sin compresión, sin manifiesto, sin errores.
+STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# 4. DICCIONARIO STORAGES (Actualizado para coincidir)
+# 4. DICCIONARIO STORAGES (Django 5.x)
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.StaticFilesStorage",
     },
 }
 
