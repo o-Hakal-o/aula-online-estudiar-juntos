@@ -91,7 +91,7 @@ class FileManagementView(APIView):
 
 class FileDownloadView(APIView):
     class FileDownloadView(APIView):
-    permission_classes = [IsStudentOrProfessor]
+        permission_classes = [IsStudentOrProfessor]
 
     def get(self, request, file_id, format=None):
         try:
