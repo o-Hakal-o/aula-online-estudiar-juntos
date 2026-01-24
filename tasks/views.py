@@ -96,22 +96,23 @@ class FileDownloadView(APIView):
         try:
             file_instance = ProfessorFile.objects.get(pk=file_id)
             
-            # --- CORRECCIÓN PARA CLOUDINARY ---
-            # No podemos usar open() porque el archivo está en la nube, no en el servidor.
-            # Lo correcto es obtener la URL pública y redirigir al navegador,
-            # o devolver la URL para que el frontend la descargue.
-            
             if file_instance.file:
+                # request.build_absolute_uri() convierte la ruta relativa 
+                # en una URL completa: http://127.0.0.1:8000/media/...
+                full_url = request.build_absolute_uri(file_instance.file.url)
+                
                 return Response({
-                    "download_url": file_instance.file.url.replace("/upload/", "/upload/fl_attachment/"),
+                    "download_url": full_url,
                     "title": file_instance.title
                 }, status=status.HTTP_200_OK)
             else:
-                 return Response({"error": "El archivo no tiene URL asociada."}, status=status.HTTP_404_NOT_FOUND)
+                return Response({"error": "No hay archivo"}, status=status.HTTP_404_NOT_FOUND)
 
         except ProfessorFile.DoesNotExist:
             return Response({"detail": "No existe."}, status=status.HTTP_404_NOT_FOUND)
-
+        
+        
+        
 # ... (El resto de tus vistas de PasswordReset se ven bien y las puedes mantener igual) ...
 class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
