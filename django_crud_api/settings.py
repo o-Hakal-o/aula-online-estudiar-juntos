@@ -16,6 +16,19 @@ from dotenv import load_dotenv
 from datetime import timedelta
 import dj_database_url 
 import cloudinary_storage
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),  # Corto por seguridad
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Largo para comodidad
+    'ROTATE_REFRESH_TOKENS': True,                  # Al usar un refresh, te dan uno nuevo también
+    'BLACKLIST_AFTER_ROTATION': True,               # El refresh viejo queda invalidado
+    'AUTH_HEADER_TYPES': ('Bearer',),
+}
+
+
+
+
 load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
