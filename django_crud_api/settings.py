@@ -160,8 +160,9 @@ USE_TZ = True
 
 # 1. Definición para archivos estáticos (CSS, JS)
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
 
 # 2. Definición para archivos subidos (Media)
 MEDIA_URL = '/media/'
