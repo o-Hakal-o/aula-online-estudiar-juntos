@@ -45,18 +45,18 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Application definition
 
 INSTALLED_APPS = [
-    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'cloudinary',
     "rest_framework",
     "corsheaders",
     'coreapi',
     'django_extensions',
+    'cloudinary',
+    'cloudinary_storage',
     'tasks',
     'rest_framework_simplejwt',
     
@@ -158,31 +158,23 @@ USE_TZ = True
 
 # --- CONFIGURACIÓN DE ARCHIVOS (ESTÁTICOS Y MEDIA) ---
 
-# 1. Definición para archivos estáticos (CSS, JS)
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-if os.path.exists(os.path.join(BASE_DIR, 'static')):
-    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
-
-# 2. Definición para archivos subidos (Media)
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-
-# 3. COMPATIBILIDAD (¡CRUCIAL PARA EL ERROR!)
-# Aunque usemos STORAGES, django-cloudinary-storage NECESITA leer esta variable
-# para no romper el collectstatic. Apuntamos a WhiteNoise.
-STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"  # <--- ESTA LÍNEA ES LA CURA
-
-# 4. CONFIGURACIÓN MODERNA (DJANGO 5.x)
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.RawMediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.StaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+# 2. Definición para archivos subidos (Media)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
 
 
 
