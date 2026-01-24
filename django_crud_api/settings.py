@@ -156,20 +156,25 @@ USE_TZ = True
 
 
 
-# --- ARCHIVOS ESTÁTICOS (CSS, JS, Imágenes del proyecto) ---
+# --- CONFIGURACIÓN DE ARCHIVOS (ESTÁTICOS Y MEDIA) ---
+
+# 1. Definición para archivos estáticos (CSS, JS) usando WhiteNoise
 STATIC_URL = '/static/'
-
-# 1. Esto le dice a Django dónde buscar tu carpeta 'static' de la raíz
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static'),
-]
-
-# 2. Donde se guardarán para producción (Render)
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# 3. Al usar Cloudinary + WhiteNoise, esta configuración es la que no falla:
-WHITENOISE_USE_FINDERS = True
+# 2. Definición para archivos subidos (Media)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# 3. LAS VARIABLES QUE PIDEN LAS LIBRERÍAS (Solución al error del Build)
+# Cloudinary Storage para Media
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+# WhiteNoise para Static (Esto es lo que Render necesita)
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+# 4. DICCIONARIO STORAGES (Para compatibilidad total con Django 5.x)
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
@@ -178,6 +183,8 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+
 
 
 MEDIA_URL = '/media/'
