@@ -35,6 +35,6 @@ class ProfessorFile(models.Model):
     
     title = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
-    file = CloudinaryField('resource_type'='raw', folder='professor_uploads/')
+    file = CloudinaryField(resource_type='raw', folder='professor_uploads/')
     def __str__(self):
         return f"{self.title} - {self.uploaded_by.email}"
