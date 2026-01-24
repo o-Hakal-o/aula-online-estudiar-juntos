@@ -156,23 +156,25 @@ USE_TZ = True
 
 
 
-# --- CONFIGURACIÓN DE ARCHIVOS ---
+# --- CONFIGURACIÓN DE ARCHIVOS (ESTÁTICOS Y MEDIA) ---
 
+# 1. Definición para archivos estáticos (CSS, JS)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# Solo añade esto si realmente tienes una carpeta llamada 'static' en tu raíz
-# Si no la tienes, comenta la línea STATICFILES_DIRS para evitar errores
 if os.path.exists(os.path.join(BASE_DIR, 'static')):
     STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-# MEDIA
+# 2. Definición para archivos subidos (Media)
 MEDIA_URL = '/media/'
-# Usamos RawMedia para que acepte .docx, .pdf, etc. sin dar error 404
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.RawMediaCloudinaryStorage'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# STORAGES (Django 5.x)
-# Eliminamos las variables viejas (STATICFILES_STORAGE) y usamos solo este diccionario
+# 3. COMPATIBILIDAD (¡CRUCIAL PARA EL ERROR!)
+# Aunque usemos STORAGES, django-cloudinary-storage NECESITA leer esta variable
+# para no romper el collectstatic. Apuntamos a WhiteNoise.
+STATICFILES_STORAGE = "whitenoise.storage.StaticFilesStorage"  # <--- ESTA LÍNEA ES LA CURA
+
+# 4. CONFIGURACIÓN MODERNA (DJANGO 5.x)
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.RawMediaCloudinaryStorage",
