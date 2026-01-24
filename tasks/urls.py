@@ -9,7 +9,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from .views import LoginView, FileManagementView , PasswordResetRequestView ,PasswordResetConfirmView
-from .views import create_admin_temporal
+# from .views import create_admin_temporal
 #from .views import RegisterView
 
 router = routers.DefaultRouter()
@@ -24,10 +24,11 @@ urlpatterns = [
     path('auth/login/', LoginView.as_view(), name='token_obtain_pair'),
     # 3. Token Refresh - Get a new access token using a valid refresh token
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    
     # 4. Redirect t the place where the teachers uppload archives 
     path('api/files/', FileManagementView.as_view(), name='files_manager'),
     path('api/files/download/<int:file_id>/', FileDownloadView.as_view(), name='file_download'),
    path('auth/password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),
    path('auth/password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-   path('setup-admin-secret-99/', create_admin_temporal)
+   
 ]
