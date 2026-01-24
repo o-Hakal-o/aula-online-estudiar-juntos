@@ -103,7 +103,7 @@ class FileDownloadView(APIView):
             
             if file_instance.file:
                 return Response({
-                    "download_url": file_instance.file.url,
+                    "download_url": file_instance.file.url.replace("/upload/", "/upload/fl_attachment/"),
                     "title": file_instance.title
                 }, status=status.HTTP_200_OK)
             else:
@@ -171,17 +171,17 @@ class PasswordResetConfirmView(APIView):
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 
-def create_admin_temporal(request):
-    User = get_user_model()
-    email = "itacknowledge@gmail.com"
-    password = "TuPasswordSegura123" # <--- Cámbiala aquí
+# def create_admin_temporal(request):
+#     User = get_user_model()
+#     email = "itacknowledge@gmail.com"
+#     password = "TuPasswordSegura123" # <--- Cámbiala aquí
     
-    if not User.objects.filter(email=email).exists():
-        User.objects.create_superuser(
-            email=email, 
-            password=password,
-            username="admin" # Si tu modelo usa username, si no, bórralo
-        )
-        return HttpResponse(f"¡Éxito! Superusuario {email} creado correctamente.")
-    else:
-        return HttpResponse("El usuario ya existe en la base de datos.")
+#     if not User.objects.filter(email=email).exists():
+#         User.objects.create_superuser(
+#             email=email, 
+#             password=password,
+#             username="admin" # Si tu modelo usa username, si no, bórralo
+#         )
+#         return HttpResponse(f"¡Éxito! Superusuario {email} creado correctamente.")
+#     else:
+#         return HttpResponse("El usuario ya existe en la base de datos.")
