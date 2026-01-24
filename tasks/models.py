@@ -32,7 +32,7 @@ class ProfessorFile(models.Model):
         related_name='files'
     )
     # upload_to indica la carpeta dentro de Cloudinary
-    file = models.FileField(upload_to='professor_uploads/')
+    
     title = models.CharField(max_length=255, blank=True)
     uploaded_at = models.DateTimeField(auto_now_add=True)
     file = CloudinaryField('resource_type'='raw', folder='professor_uploads/')

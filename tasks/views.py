@@ -90,6 +90,7 @@ class FileManagementView(APIView):
 
 
 class FileDownloadView(APIView):
+    class FileDownloadView(APIView):
     permission_classes = [IsStudentOrProfessor]
 
     def get(self, request, file_id, format=None):
@@ -97,12 +98,15 @@ class FileDownloadView(APIView):
             file_instance = ProfessorFile.objects.get(pk=file_id)
             
             if file_instance.file:
-                # request.build_absolute_uri() convierte la ruta relativa 
-                # en una URL completa: http://127.0.0.1:8000/media/...
-                full_url = request.build_absolute_uri(file_instance.file.url)
+                # Cloudinary ya entrega la URL absoluta. No necesitas build_absolute_uri
+                download_url = file_instance.file.url
                 
+                # Opcional: Si quieres forzar la descarga inmediata
+                if ".cloudinary.com" in download_url:
+                    download_url = download_url.replace("/upload/", "/upload/fl_attachment/")
+
                 return Response({
-                    "download_url": full_url,
+                    "download_url": download_url,
                     "title": file_instance.title
                 }, status=status.HTTP_200_OK)
             else:
