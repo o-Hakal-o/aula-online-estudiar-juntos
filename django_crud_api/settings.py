@@ -158,6 +158,7 @@ USE_TZ = True
 
 # --- CONFIGURACIÓN DE ARCHIVOS (ESTÁTICOS Y MEDIA) ---
 
+WHITENOISE_MANIFEST_STRICT = False
 # 1. Definición para archivos estáticos (CSS, JS) usando WhiteNoise
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
