@@ -72,6 +72,7 @@ INSTALLED_APPS = [
     'cloudinary_storage',
     'tasks',
     'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist'
     
      
     
