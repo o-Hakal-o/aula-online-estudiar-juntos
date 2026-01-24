@@ -159,6 +159,7 @@ USE_TZ = True
 # --- CONFIGURACIÓN DE ARCHIVOS (ESTÁTICOS Y MEDIA) ---
 
 WHITENOISE_MANIFEST_STRICT = False
+
 # 1. Definición para archivos estáticos (CSS, JS) usando WhiteNoise
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
@@ -168,20 +169,18 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# 3. LAS VARIABLES QUE PIDEN LAS LIBRERÍAS (Solución al error del Build)
-# Cloudinary Storage para Media
+# 3. CAMBIO CRÍTICO: Usamos 'CompressedStaticFilesStorage' (SIN Manifest)
+# Esto evita el error de "MissingFileError" porque no chequea referencias internas.
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
 
-# WhiteNoise para Static (Esto es lo que Render necesita)
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
-# 4. DICCIONARIO STORAGES (Para compatibilidad total con Django 5.x)
+# 4. DICCIONARIO STORAGES (Actualizado para coincidir)
 STORAGES = {
     "default": {
         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
     },
     "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
     },
 }
 
