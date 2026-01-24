@@ -45,12 +45,12 @@ if RENDER_EXTERNAL_HOSTNAME:
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudinary_storage',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'cloudinary_storage',
     'django.contrib.staticfiles',
     'cloudinary',
     "rest_framework",
@@ -156,27 +156,26 @@ USE_TZ = True
 
 
 
-# --- CONFIGURACIÓN DE ARCHIVOS (ESTÁTICOS Y MEDIA) ---
+# --- CONFIGURACIÓN DE ARCHIVOS ---
 
-# 1. Definición para archivos estáticos (CSS, JS)
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
+# Solo añade esto si realmente tienes una carpeta llamada 'static' en tu raíz
+# Si no la tienes, comenta la línea STATICFILES_DIRS para evitar errores
+if os.path.exists(os.path.join(BASE_DIR, 'static')):
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
-# 2. Definición para archivos subidos (Media)
+# MEDIA
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+# Usamos RawMedia para que acepte .docx, .pdf, etc. sin dar error 404
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.RawMediaCloudinaryStorage'
 
-# 3. VARIABLES DE COMPATIBILIDAD (Solución: Usamos almacenamiento BÁSICO)
-# Usamos 'StaticFilesStorage' a secas. Sin compresión, sin manifiesto, sin errores.
-STATICFILES_STORAGE = 'whitenoise.storage.StaticFilesStorage'
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
-
-# 4. DICCIONARIO STORAGES (Django 5.x)
+# STORAGES (Django 5.x)
+# Eliminamos las variables viejas (STATICFILES_STORAGE) y usamos solo este diccionario
 STORAGES = {
     "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        "BACKEND": "cloudinary_storage.storage.RawMediaCloudinaryStorage",
     },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.StaticFilesStorage",
@@ -185,9 +184,6 @@ STORAGES = {
 
 
 
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # Default primary key field type
