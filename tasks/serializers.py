@@ -46,30 +46,7 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
     def get_download_url(self, obj):
         if not obj.file:
             return None
-
-        url = obj.file.url
-
-        # Solo si es Cloudinary
-        if ".cloudinary.com" not in url:
-            return url
-
-        # Asegurar recurso RAW
-        if "/image/upload/" in url:
-            url = url.replace("/image/upload/", "/raw/upload/")
-
-        # Forzar descarga SOLO si no está ya
-        if "fl_attachment" not in url:
-            url = url.replace(
-                "/upload/",
-                "/upload/fl_attachment/",
-                1
-            )
-
-        # 🔒 Limpieza extra: evitar doble raw/upload
-        url = url.replace("/raw/upload/raw/upload/", "/raw/upload/")
-
-        return url
-
+        return obj.file.url
 
 
 
