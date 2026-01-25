@@ -25,13 +25,24 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 # --- OTROS SERIALIZADORES ---
 
-import re # Usaremos expresiones regulares para ser precisos
-
 import os
+from rest_framework import serializers
 
 class ProfessorFileSerializer(serializers.ModelSerializer):
-    # ... tus otros campos ...
+    uploaded_by_email = serializers.ReadOnlyField(source='uploaded_by.email')
     download_url = serializers.SerializerMethodField()
+
+    class Meta:
+        model = ProfessorFile
+        fields = [
+            'id', 
+            'title', 
+            'uploaded_at', 
+            'uploaded_by', 
+            'uploaded_by_email', 
+            'download_url'
+        ]
+        read_only_fields = ['uploaded_by', 'uploaded_at']
 
     def get_download_url(self, obj):
         if not obj.file:
@@ -39,7 +50,7 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
         
         url = obj.file.url
         
-        # 1. Forzar HTTPS
+        # 1. Asegurar HTTPS para evitar bloqueos
         if url.startswith("http://"):
             url = url.replace("http://", "https://", 1)
 
@@ -48,22 +59,21 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
         image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
         
         if ".cloudinary.com" in url:
-            # LIMPIEZA CRÍTICA: Eliminar prefijos de media que rompen el acceso público
-            # Esto quita cualquier "/media/" o carpetas extra que Django inserte antes de "upload"
+            # 3. Limpieza de URL para evitar el error 401
+            # Reconstruimos la URL para que sea puramente de Cloudinary
             if "/upload/" in url:
                 parts = url.split("/upload/")
-                # Reconstruimos la URL asegurando que empiece directamente en la base de Cloudinary
+                # Obtenemos la base (ej: https://res.cloudinary.com/nombre/)
                 base_url = parts[0].split(".com/")[0] + ".com/"
                 path_after_upload = parts[1]
                 
-                # Identificar el tipo de recurso correcto
+                # Definir si es image o raw según la extensión
                 resource_type = "image" if ext in image_extensions else "raw"
                 
-                # Reconstruir la URL limpia con el flag de descarga
+                # Reensamblar con el flag de descarga automática (fl_attachment)
                 url = f"{base_url}{resource_type}/upload/fl_attachment/{path_after_upload}"
 
         return url
-
 
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
