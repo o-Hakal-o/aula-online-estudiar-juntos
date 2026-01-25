@@ -55,22 +55,15 @@ class FileManagementView(APIView):
     parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
-        # Obtenemos todos los archivos
+        # Traemos todos los archivos ordenados por fecha
         files = ProfessorFile.objects.all().order_by('-uploaded_at') 
         
-        # El serializer ahora incluye 'download_url' automáticamente
+        # El serializer hará todo el trabajo sucio con el download_url
         serializer = ProfessorFileSerializer(files, many=True)
         
         return Response({
-            "message": "Lista de archivos actualizada",
+            "message": "Lista de archivos cargada correctamente",
             "count": files.count(),
-            "data": serializer.data
-        }, status=status.HTTP_200_OK)
-
-        serializer = ProfessorFileSerializer(files, many=True)
-        return Response({
-            "message": message, 
-            "count": files.count(), # Añadimos un contador útil
             "data": serializer.data
         }, status=status.HTTP_200_OK)
 
@@ -101,32 +94,32 @@ class FileManagementView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-class FileDownloadView(APIView):
-    # Al usar tu permiso personalizado que revisa is_authenticated,
-    # el token es obligatorio aquí.
-    permission_classes = [IsStudentOrProfessor]
+# class FileDownloadView(APIView):
+#     # Al usar tu permiso personalizado que revisa is_authenticated,
+#     # el token es obligatorio aquí.
+#     permission_classes = [IsStudentOrProfessor]
     
-    def get(self, request, file_id, format=None):
-        try:
-            file_instance = ProfessorFile.objects.get(pk=file_id)
+#     def get(self, request, file_id, format=None):
+#         try:
+#             file_instance = ProfessorFile.objects.get(pk=file_id)
             
-            # Verificamos si existe el archivo físico/link
-            if file_instance.file:
-                download_url = file_instance.file.url
+#             # Verificamos si existe el archivo físico/link
+#             if file_instance.file:
+#                 download_url = file_instance.file.url
                 
-                # Transformación de Cloudinary para forzar descarga
-                if ".cloudinary.com" in download_url:
-                    download_url = download_url.replace("/upload/", "/upload/fl_attachment/")
+#                 # Transformación de Cloudinary para forzar descarga
+#                 if ".cloudinary.com" in download_url:
+#                     download_url = download_url.replace("/upload/", "/upload/fl_attachment/")
 
-                return Response({
-                    "download_url": download_url,
-                    "title": file_instance.title
-                }, status=status.HTTP_200_OK)
-            else:
-                return Response({"error": "No hay archivo adjunto"}, status=status.HTTP_404_NOT_FOUND)
+#                 return Response({
+#                     "download_url": download_url,
+#                     "title": file_instance.title
+#                 }, status=status.HTTP_200_OK)
+#             else:
+#                 return Response({"error": "No hay archivo adjunto"}, status=status.HTTP_404_NOT_FOUND)
                 
-        except ProfessorFile.DoesNotExist:
-            return Response({"detail": "El archivo no existe."}, status=status.HTTP_404_NOT_FOUND)
+#         except ProfessorFile.DoesNotExist:
+#             return Response({"detail": "El archivo no existe."}, status=status.HTTP_404_NOT_FOUND)
         
         
         
