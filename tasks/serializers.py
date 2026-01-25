@@ -47,7 +47,7 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
         if not obj.file:
             return None
 
-    url = obj.file.url
+        url = obj.file.url
 
     # Solo si es Cloudinary
     if ".cloudinary.com" not in url:
