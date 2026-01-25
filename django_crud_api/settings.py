@@ -18,13 +18,6 @@ import dj_database_url
 import cloudinary_storage
 from datetime import timedelta
 
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),  # Corto por seguridad
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Largo para comodidad
-    'ROTATE_REFRESH_TOKENS': True,                  # Al usar un refresh, te dan uno nuevo también
-    'BLACKLIST_AFTER_ROTATION': True,               # El refresh viejo queda invalidado
-    'AUTH_HEADER_TYPES': ('Bearer',),
-}
 
 
 
@@ -207,17 +200,11 @@ REST_FRAMEWORK = {
 
 
 SIMPLE_JWT = {
-    # Access tokens are short-lived for security (e.g., 5 minutes)
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
-    
-    # Refresh tokens are long-lived, which you use at /refresh/ (e.g., 7 days)
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
-    
-    # This setting is usually True by default but good to verify
-    "ROTATE_REFRESH_TOKENS": False,
-    
-    # The key used in the header when authenticating
-    "AUTH_HEADER_TYPES": ("Bearer",),
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=15),  # Corto por seguridad
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Largo para comodidad
+    'ROTATE_REFRESH_TOKENS': True,                  # Al usar un refresh, te dan uno nuevo también
+    'BLACKLIST_AFTER_ROTATION': True,               # El refresh viejo queda invalidado
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
 
  
