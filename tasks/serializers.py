@@ -27,45 +27,37 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 import re # Usaremos expresiones regulares para ser precisos
 
-class ProfessorFileSerializer(serializers.ModelSerializer):
-    uploaded_by_email = serializers.ReadOnlyField(source='uploaded_by.email')
-    download_url = serializers.SerializerMethodField()
+import os
 
-    class Meta:
-        model = ProfessorFile
-        fields = [
-            'id',
-            'title',
-            'uploaded_at',
-            'uploaded_by',
-            'uploaded_by_email',
-            'download_url',
-        ]
-        read_only_fields = ['uploaded_by', 'uploaded_at']
-
-    def get_download_url(self, obj):
+def get_download_url(self, obj):
         if not obj.file:
             return None
         
-        # Obtenemos la URL original
         url = obj.file.url
         
-        # 1. Forzar HTTPS (Evita bloqueos en Render/Navegadores)
+        # 1. Forzar HTTPS
         if url.startswith("http://"):
             url = url.replace("http://", "https://", 1)
 
-        # 2. Ajuste para archivos No-Imagen (PDF, RAR, DOCX)
-        if ".cloudinary.com" in url:
-            # Cloudinary a veces pone /image/upload/ por defecto, 
-            # pero los archivos raw requieren /raw/upload/
-            if "/image/upload/" in url:
-                url = url.replace("/image/upload/", "/raw/upload/")
-            
-            # 3. Forzar Descarga (Flag fl_attachment)
-            # Solo lo añadimos si no está ya presente para no romper la URL
-            if "/upload/" in url and "fl_attachment" not in url:
-                url = url.replace("/upload/", "/upload/fl_attachment/", 1)
+        # 2. Detectar extensión
+        ext = os.path.splitext(url)[1].lower()
+        image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
         
+        if ".cloudinary.com" in url:
+            # LIMPIEZA CRÍTICA: Eliminar prefijos de media que rompen el acceso público
+            # Esto quita cualquier "/media/" o carpetas extra que Django inserte antes de "upload"
+            if "/upload/" in url:
+                parts = url.split("/upload/")
+                # Reconstruimos la URL asegurando que empiece directamente en la base de Cloudinary
+                base_url = parts[0].split(".com/")[0] + ".com/"
+                path_after_upload = parts[1]
+                
+                # Identificar el tipo de recurso correcto
+                resource_type = "image" if ext in image_extensions else "raw"
+                
+                # Reconstruir la URL limpia con el flag de descarga
+                url = f"{base_url}{resource_type}/upload/fl_attachment/{path_after_upload}"
+
         return url
 
 
