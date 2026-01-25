@@ -28,6 +28,10 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 import os
 from rest_framework import serializers
 
+import os
+from rest_framework import serializers
+from .models import ProfessorFile
+
 class ProfessorFileSerializer(serializers.ModelSerializer):
     uploaded_by_email = serializers.ReadOnlyField(source='uploaded_by.email')
     download_url = serializers.SerializerMethodField()
@@ -48,30 +52,20 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
         if not obj.file:
             return None
         
+        # Obtenemos la URL que Django/Cloudinary nos da por defecto
         url = obj.file.url
         
-        # 1. Asegurar HTTPS para evitar bloqueos
+        # 1. Forzar HTTPS
         if url.startswith("http://"):
             url = url.replace("http://", "https://", 1)
 
-        # 2. Detectar extensión
-        ext = os.path.splitext(url)[1].lower()
-        image_extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp']
-        
-        if ".cloudinary.com" in url:
-            # 3. Limpieza de URL para evitar el error 401
-            # Reconstruimos la URL para que sea puramente de Cloudinary
-            if "/upload/" in url:
-                parts = url.split("/upload/")
-                # Obtenemos la base (ej: https://res.cloudinary.com/nombre/)
-                base_url = parts[0].split(".com/")[0] + ".com/"
-                path_after_upload = parts[1]
-                
-                # Definir si es image o raw según la extensión
-                resource_type = "image" if ext in image_extensions else "raw"
-                
-                # Reensamblar con el flag de descarga automática (fl_attachment)
-                url = f"{base_url}{resource_type}/upload/fl_attachment/{path_after_upload}"
+        # 2. Inyectar el flag de descarga (fl_attachment)
+        # Solo lo hacemos si es una URL de Cloudinary y no lo tiene ya
+        if ".cloudinary.com" in url and "/upload/" in url:
+            if "fl_attachment" not in url:
+                # Insertamos fl_attachment justo después de /upload/
+                # Esto funciona para 'image', 'video' y 'raw' por igual
+                url = url.replace("/upload/", "/upload/fl_attachment/", 1)
 
         return url
 
