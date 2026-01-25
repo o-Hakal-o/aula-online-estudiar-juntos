@@ -51,27 +51,27 @@ class IsProfessorOrReadOnly(BasePermission):
 # ==========================================
 
 class FileManagementView(APIView):
-    # Usamos el permiso nuevo. Esto garantiza Token SIEMPRE.
+    # El permiso IsProfessorOrReadOnly sigue garantizando que:
+    # 1. Todos deben tener Token para el GET.
+    # 2. Solo los PROFESSOR pueden hacer POST/DELETE.
     permission_classes = [IsProfessorOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
-        # Gracias a IsProfessorOrReadOnly, ya sabemos que request.user existe
-        if request.user.role == 'PROFESSOR':
-            # El profesor ve SOLO sus archivos
-            files = ProfessorFile.objects.filter(uploaded_by=request.user)
-            message = "Tus archivos subidos."
-        else:
-            # El estudiante ve TODOS los archivos (según tu lógica original)
-            files = ProfessorFile.objects.all()
-            message = "Archivos disponibles."
+        # Eliminamos el filtrado por usuario. 
+        # Ahora traemos TODOS los registros de la base de datos.
+        files = ProfessorFile.objects.all().order_by('-uploaded_at') 
+        message = "Lista completa de archivos disponibles."
 
         serializer = ProfessorFileSerializer(files, many=True)
-        return Response({"message": message, "data": serializer.data}, status=status.HTTP_200_OK)
+        return Response({
+            "message": message, 
+            "count": files.count(), # Añadimos un contador útil
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)
 
     def post(self, request):
-        # El permiso IsProfessorOrReadOnly ya bloqueó a los estudiantes aquí.
-        # Solo entran profesores.
+        # Se mantiene igual: Solo profesores pueden subir
         serializer = ProfessorFileSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(uploaded_by=request.user)
@@ -79,29 +79,23 @@ class FileManagementView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request):
-        # El permiso IsProfessorOrReadOnly ya bloqueó a los estudiantes aquí.
-        
-        # OJO: request.query_params es mejor práctica que request.data para GET/DELETE
+        # Se mantiene igual: Solo el dueño puede borrar su archivo
         file_id = request.query_params.get('id') 
-        
         if not file_id:
             return Response({"error": "Falta el ID (?id=1)"}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            # CANDADO FINAL: Solo permitimos borrar si el archivo pertenece al usuario actual
+            # Aquí mantenemos el filtro 'uploaded_by=request.user' por seguridad:
+            # Aunque todos vean todo, no queremos que un Profe borre archivos de otro.
             file_obj = ProfessorFile.objects.get(id=file_id, uploaded_by=request.user)
-            
-            # Borrado lógico y físico (Cloudinary)
             file_obj.delete()
-            
             return Response({"message": "Archivo eliminado correctamente."}, status=status.HTTP_204_NO_CONTENT)
             
         except ProfessorFile.DoesNotExist:
             return Response(
-                {"error": "Archivo no encontrado o no tienes permiso para eliminarlo."}, 
+                {"error": "Archivo no encontrado o no tienes permiso para borrarlo."}, 
                 status=status.HTTP_404_NOT_FOUND
             )
-
 
 class FileDownloadView(APIView):
     # Al usar tu permiso personalizado que revisa is_authenticated,
@@ -136,7 +130,7 @@ class FileDownloadView(APIView):
         
         
         
-# ... (El resto de tus vistas de PasswordReset se ven bien y las puedes mantener igual) ...
+
 class PasswordResetRequestView(APIView):
     permission_classes = [permissions.AllowAny]
 
