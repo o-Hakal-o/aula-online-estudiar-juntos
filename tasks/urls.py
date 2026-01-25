@@ -27,7 +27,7 @@ urlpatterns = [
     
     # 4. Redirect t the place where the teachers uppload archives 
     path('api/files/', FileManagementView.as_view(), name='files_manager'),
-    path('api/files/download/<int:file_id>/', FileDownloadView.as_view(), name='file_download'),
+    # path('api/files/download/<int:file_id>/', FileDownloadView.as_view(), name='file_download'),
    path('auth/password-reset/', PasswordResetRequestView.as_view(), name='password_reset'),
    path('auth/password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
    
