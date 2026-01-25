@@ -51,17 +51,21 @@ class IsProfessorOrReadOnly(BasePermission):
 # ==========================================
 
 class FileManagementView(APIView):
-    # El permiso IsProfessorOrReadOnly sigue garantizando que:
-    # 1. Todos deben tener Token para el GET.
-    # 2. Solo los PROFESSOR pueden hacer POST/DELETE.
     permission_classes = [IsProfessorOrReadOnly]
     parser_classes = [MultiPartParser, FormParser]
 
     def get(self, request):
-        # Eliminamos el filtrado por usuario. 
-        # Ahora traemos TODOS los registros de la base de datos.
+        # Obtenemos todos los archivos
         files = ProfessorFile.objects.all().order_by('-uploaded_at') 
-        message = "Lista completa de archivos disponibles."
+        
+        # El serializer ahora incluye 'download_url' automáticamente
+        serializer = ProfessorFileSerializer(files, many=True)
+        
+        return Response({
+            "message": "Lista de archivos actualizada",
+            "count": files.count(),
+            "data": serializer.data
+        }, status=status.HTTP_200_OK)
 
         serializer = ProfessorFileSerializer(files, many=True)
         return Response({

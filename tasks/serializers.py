@@ -27,12 +27,31 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 class ProfessorFileSerializer(serializers.ModelSerializer):
     uploaded_by_email = serializers.ReadOnlyField(source='uploaded_by.email')
+    download_url = serializers.SerializerMethodField()
 
     class Meta:
         model = ProfessorFile
-        fields = ['id', 'file', 'title', 'uploaded_at', 'uploaded_by', 'uploaded_by_email']
+        fields = ['id', 'file', 'title', 'uploaded_at', 'uploaded_by', 'uploaded_by_email', 'download_url']
         read_only_fields = ['uploaded_by', 'uploaded_at']
 
+    def get_download_url(self, obj):
+        if not obj.file:
+            return None
+        
+        url = obj.file.url
+        
+        # LÓGICA PARA EVITAR EL 404 EN CLOUDINARY
+        if ".cloudinary.com" in url:
+            # 1. Aseguramos que los documentos se traten como 'raw' y no como 'image'
+            # Esto corrige el 404 típico de archivos Word/PDF
+            if "/image/upload/" in url:
+                url = url.replace("/image/upload/", "/raw/upload/")
+            
+            # 2. Forzamos la descarga (attachment)
+            if "/upload/" in url and "fl_attachment" not in url:
+                url = url.replace("/upload/", "/upload/fl_attachment/")
+                
+        return url
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
