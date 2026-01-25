@@ -46,7 +46,27 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
     def get_download_url(self, obj):
         if not obj.file:
             return None
-        return obj.file.url
+        
+        # Obtenemos la URL original
+        url = obj.file.url
+        
+        # 1. Forzar HTTPS (Evita bloqueos en Render/Navegadores)
+        if url.startswith("http://"):
+            url = url.replace("http://", "https://", 1)
+
+        # 2. Ajuste para archivos No-Imagen (PDF, RAR, DOCX)
+        if ".cloudinary.com" in url:
+            # Cloudinary a veces pone /image/upload/ por defecto, 
+            # pero los archivos raw requieren /raw/upload/
+            if "/image/upload/" in url:
+                url = url.replace("/image/upload/", "/raw/upload/")
+            
+            # 3. Forzar Descarga (Flag fl_attachment)
+            # Solo lo añadimos si no está ya presente para no romper la URL
+            if "/upload/" in url and "fl_attachment" not in url:
+                url = url.replace("/upload/", "/upload/fl_attachment/", 1)
+        
+        return url
 
 
 
