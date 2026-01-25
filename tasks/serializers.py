@@ -29,7 +29,11 @@ import re # Usaremos expresiones regulares para ser precisos
 
 import os
 
-def get_download_url(self, obj):
+class ProfessorFileSerializer(serializers.ModelSerializer):
+    # ... tus otros campos ...
+    download_url = serializers.SerializerMethodField()
+
+    def get_download_url(self, obj):
         if not obj.file:
             return None
         
@@ -59,7 +63,6 @@ def get_download_url(self, obj):
                 url = f"{base_url}{resource_type}/upload/fl_attachment/{path_after_upload}"
 
         return url
-
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):
