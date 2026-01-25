@@ -70,7 +70,6 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
 
 
 
-
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 

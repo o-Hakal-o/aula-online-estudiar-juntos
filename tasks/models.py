@@ -35,7 +35,7 @@ class ProfessorFile(models.Model):
 
     # ✅ CAMBIO CLAVE
     file = CloudinaryField(
-        resource_type="raw",
+        resource_type="auto",
         folder="professor_uploads"
     )
 
