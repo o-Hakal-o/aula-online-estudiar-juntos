@@ -44,8 +44,8 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
         read_only_fields = ['uploaded_by', 'uploaded_at']
 
     def get_download_url(self, obj):
-    if not obj.file:
-        return None
+        if not obj.file:
+            return None
 
     url = obj.file.url
 
