@@ -25,6 +25,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
 # --- OTROS SERIALIZADORES ---
 
+import re # Usaremos expresiones regulares para ser precisos
+
 class ProfessorFileSerializer(serializers.ModelSerializer):
     uploaded_by_email = serializers.ReadOnlyField(source='uploaded_by.email')
     download_url = serializers.SerializerMethodField()
@@ -40,18 +42,19 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
         
         url = obj.file.url
         
-        # LÓGICA PARA EVITAR EL 404 EN CLOUDINARY
         if ".cloudinary.com" in url:
-            # 1. Aseguramos que los documentos se traten como 'raw' y no como 'image'
-            # Esto corrige el 404 típico de archivos Word/PDF
+            # 1. Corregimos el tipo de recurso de 'image' a 'raw' (para archivos .docx, .pdf, etc.)
+            # Solo lo hacemos si detectamos que Cloudinary lo marcó mal
             if "/image/upload/" in url:
                 url = url.replace("/image/upload/", "/raw/upload/")
             
-            # 2. Forzamos la descarga (attachment)
+            # 2. Forzamos la descarga SOLO SI no está ya presente el flag
+            # Usamos un reemplazo limitado a 1 para evitar duplicaciones como en tu captura
             if "/upload/" in url and "fl_attachment" not in url:
-                url = url.replace("/upload/", "/upload/fl_attachment/")
+                url = url.replace("/upload/", "/upload/fl_attachment/", 1)
                 
         return url
+
 class PasswordResetRequestSerializer(serializers.Serializer):
     email = serializers.EmailField()
 
