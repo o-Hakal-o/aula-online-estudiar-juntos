@@ -47,16 +47,20 @@ class ProfessorFileSerializer(serializers.ModelSerializer):
         if not obj.file:
             return None
 
-        # public_id real del archivo en Cloudinary
-        public_id = obj.file.public_id
+        url = obj.file.url
 
-        url, _ = cloudinary_url(
-            public_id,
-            resource_type="raw",       # 👈 CLAVE
-            flags="attachment"         # 👈 descarga forzada
-        )
+        # ✅ Normalización SEGURA para Cloudinary
+        if ".cloudinary.com" in url:
+            # Si Cloudinary lo sirvió como image pero es un archivo
+            if "/image/upload/" in url:
+                url = url.replace("/image/upload/", "/raw/upload/")
+
+            # Forzar descarga (una sola vez)
+            if "fl_attachment" not in url:
+                url = url.replace("/upload/", "/upload/fl_attachment/", 1)
 
         return url
+
 
 
 class PasswordResetRequestSerializer(serializers.Serializer):
