@@ -8,7 +8,8 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
-from .views import LoginView, FileManagementView , PasswordResetRequestView ,PasswordResetConfirmView
+
+from .views import LoginView, FileManagementView , LogoutView , PasswordResetRequestView ,PasswordResetConfirmView
 # from .views import create_admin_temporal
 #from .views import RegisterView
 
