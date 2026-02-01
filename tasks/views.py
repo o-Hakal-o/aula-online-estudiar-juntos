@@ -181,25 +181,29 @@ class PasswordResetConfirmView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 class LogoutView(APIView):
-    # Solo usuarios autenticados pueden cerrar sesión
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
         try:
             refresh_token = request.data.get("refresh")
             if not refresh_token:
-                return Response({"error": "Refresh token es requerido"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Se requiere el refresh token"}, status=status.HTTP_400_BAD_REQUEST)
             
             token = RefreshToken(refresh_token)
-            token.blacklist() # Añade el token a la lista negra
+            token.blacklist()  # Esto lo mete a la lista negra
 
-            return Response({"message": "Sesión cerrada con éxito"}, status=status.HTTP_205_RESET_CONTENT)
+            return Response({"message": "Logout exitoso. El refresh token ha sido invalidado."}, status=status.HTTP_200_OK)
+        except TokenError:
+            return Response({"error": "El token ya es inválido o expiró."}, status=status.HTTP_400_BAD_REQUEST)
         except Exception as e:
-            return Response({"error": "Token inválido o ya expirado"}, status=status.HTTP_400_BAD_REQUEST)
-
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+        
+        
+        
 from django.http import HttpResponse
 from django.contrib.auth import get_user_model
 
