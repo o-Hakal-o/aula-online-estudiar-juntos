@@ -191,8 +191,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # FRONTEND_URL = os.environ.get('FRONTEND_URL')
 # "http://localhost:8080","http://127.0.0.1:8080"
-CORS_ALLOWED_ORIGINS = [ "https://ittaceducation.com/"]
-CSRF_TRUSTED_ORIGINS = ["https://ittaceducation.com/"]
+CORS_ALLOWED_ORIGINS = [ "https://ittaceducation.com"]
+CSRF_TRUSTED_ORIGINS = ["https://ittaceducation.com"]
 CORS_ALLOW_CREDENTIALS = True
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS' : 'rest_framework.schemas.coreapi.AutoSchema',
